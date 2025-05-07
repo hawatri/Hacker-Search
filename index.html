@@ -93,34 +93,129 @@
     </div>
   </div>
 
-  <div id="mediaController" class="draggable flicker" role="region" aria-label="Media controller widget" tabindex="0">
-    <div class="drag-header select-none" tabindex="0" role="button" aria-label="Drag Media Controller widget">
-      Media Controller
+  <div id="mediaPlayer" class="draggable flicker" role="region" aria-label="Media player widget" tabindex="0">
+    <div class="drag-header select-none" tabindex="0" role="button" aria-label="Drag Media Player widget">
+      Media Player
       <div>
-        <button class="minimize-btn" aria-label="Minimize media controller widget">_</button>
-        <button class="resize-btn" aria-label="Resize media controller widget">↔</button>
+        <button class="minimize-btn" aria-label="Minimize media player widget">_</button>
+        <button class="resize-btn" aria-label="Resize media player widget">↔</button>
       </div>
     </div>
     <div class="widget-content">
-      <button id="playBtn" aria-label="Play" title="Play" class="toggle-btn">▶️</button>
-      <button id="pauseBtn" aria-label="Pause" title="Pause" class="toggle-btn">⏸️</button>
-      <button id="stopBtn" aria-label="Stop" title="Stop" class="toggle-btn">⏹️</button>
+      <div class="media-controls">
+        <button id="playBtn" aria-label="Play" title="Play" class="toggle-btn">PLAY</button>
+        <button id="pauseBtn" aria-label="Pause" title="Pause" class="toggle-btn">PAUSE</button>
+        <button id="stopBtn" aria-label="Stop" title="Stop" class="toggle-btn">STOP</button>
+      </div>
+      <div class="audio-player">
+        <div class="custom-audio-controls">
+          <div class="time-display">
+            <span id="currentTime">00:00</span> / <span id="duration">00:00</span>
+          </div>
+          <div class="seek-bar-container">
+            <input type="range" id="seekBar" min="0" max="100" value="0" class="seek-bar">
+          </div>
+          <div class="volume-control">
+            <span>VOL</span>
+            <input type="range" id="volumeBar" min="0" max="100" value="100" class="volume-bar">
+          </div>
+        </div>
+        <div class="now-playing">
+          <span id="selectedMediaName" class="media-file-name">No media selected</span>
+        </div>
+        <audio id="audioPlayer" preload="metadata" aria-label="Music player audio controls">
+          Your browser does not support the audio element.
+        </audio>
+      </div>
+      <div class="playlist-container">
+        <div class="playlist-header">
+          <h3>Playlist</h3>
+          <button id="clearPlaylistBtn" class="toggle-btn" title="Clear Playlist">CLEAR</button>
+        </div>
+        <div id="playlist" class="playlist">
+          <!-- Playlist items will be added here dynamically -->
+        </div>
+      </div>
+      <div class="media-file-select">
+        <div class="file-controls">
+          <input type="file" id="mediaFileInput" accept="audio/*" style="display:none;" />
+          <button id="selectMediaBtn" class="toggle-btn" type="button">Select Media</button>
+        </div>
+        <div class="folder-controls">
+          <input type="file" id="folderInput" webkitdirectory directory multiple style="display:none;" />
+          <button id="selectFolderBtn" class="toggle-btn" type="button">Select Folder</button>
+        </div>
+      </div>
     </div>
   </div>
 
-  <div id="musicPlayer" class="draggable flicker" role="region" aria-label="Music player widget" tabindex="0">
-    <div class="drag-header select-none" tabindex="0" role="button" aria-label="Drag Music Player widget">
-      Music Player
+  <div id="readmeWidget" class="draggable flicker" role="region" aria-label="README widget" tabindex="0">
+    <div class="drag-header select-none" tabindex="0" role="button" aria-label="Drag README widget">
+      README
       <div>
-        <button class="minimize-btn" aria-label="Minimize music player widget">_</button>
-        <button class="resize-btn" aria-label="Resize music player widget">↔</button>
+        <button class="minimize-btn" aria-label="Minimize README widget">_</button>
+        <button class="resize-btn" aria-label="Resize README widget">↔</button>
       </div>
     </div>
     <div class="widget-content">
-      <audio id="audioPlayer" controls preload="none" aria-label="Music player audio controls">
-        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg" />
-        Your browser does not support the audio element.
-      </audio>
+      <div class="readme-content">
+        <h3>Welcome to Hacker Search Terminal!</h3>
+        
+        <h4>Search Features:</h4>
+        <ul>
+          <li>Type your query and press Enter to search</li>
+          <li>Use search engine tags to switch between engines</li>
+          <li>Quick search: Type engine name + space + query (e.g., "yt cats")</li>
+        </ul>
+
+        <h4>Themes:</h4>
+        <ul>
+          <li>Click the gear icon to open settings</li>
+          <li>Select from 5 themes: Matrix, Cyberpunk, Retro, Hacker, Neon</li>
+          <li>Theme changes affect all UI elements and matrix background</li>
+        </ul>
+
+        <h4>Clock Widget:</h4>
+        <ul>
+          <li>Toggle between digital and analog display</li>
+          <li>Change timezone in settings</li>
+          <li>Drag widget to reposition</li>
+        </ul>
+
+        <h4>Todo List:</h4>
+        <ul>
+          <li>Add tasks using the input field</li>
+          <li>Click cross to remove tasks</li>
+          <li>Tasks are saved automatically</li>
+        </ul>
+
+        <h4>Weather Widget:</h4>
+        <ul>
+          <li>Set your location in settings</li>
+          <li>Shows temperature, wind speed, and conditions</li>
+        </ul>
+
+        <h4>Widget Controls:</h4>
+        <ul>
+          <li>Drag widgets by their headers</li>
+          <li>Click _ to minimize</li>
+          <li>Click ↔ to resize</li>
+          <li>Minimized widgets appear on the left side</li>
+        </ul>
+
+        <h4>Media Controls:</h4>
+        <ul>
+          <li>Control audio playback</li>
+          <li>Play, pause, and stop functions</li>
+        </ul>
+
+        <h4>Matrix Background:</h4>
+        <ul>
+          <li>Changes color with theme selection</li>
+          <li>Only visible when online</li>
+          <li>Automatically adjusts to window size</li>
+        </ul>
+      </div>
     </div>
   </div>
 
@@ -137,6 +232,16 @@
         <button class="close-btn" aria-label="Close settings">×</button>
       </div>
       <div class="settings-body">
+        <div class="setting-group">
+          <h3>Theme</h3>
+          <select id="themeSelect" class="settings-select">
+            <option value="matrix">Matrix (Green)</option>
+            <option value="cyberpunk">Cyberpunk (Pink)</option>
+            <option value="retro">Retro (Amber)</option>
+            <option value="hacker">Hacker (Blue)</option>
+            <option value="neon">Neon (Purple)</option>
+          </select>
+        </div>
         <div class="setting-group">
           <h3>Time Zone</h3>
           <select id="timezoneSelect" class="settings-select">

@@ -1,7 +1,73 @@
+/* Theme Variables */
+:root {
+  /* Matrix Theme (Default) */
+  --primary-color: #00ff00;
+  --primary-hover: #003300;
+  --primary-light: #66ff66;
+  --background-color: #0f0e0e;
+  --background-light: #0a0a0a;
+  --text-color: #00ff00;
+  --border-color: #00ff00;
+  --shadow-color: #00ff00;
+  --accent-color: #ff3300;
+}
+
+/* Cyberpunk Theme */
+[data-theme="cyberpunk"] {
+  --primary-color: #ff00ff;
+  --primary-hover: #330033;
+  --primary-light: #ff66ff;
+  --background-color: #0f0e0e;
+  --background-light: #0a0a0a;
+  --text-color: #ff00ff;
+  --border-color: #ff00ff;
+  --shadow-color: #ff00ff;
+  --accent-color: #00ffff;
+}
+
+/* Retro Theme */
+[data-theme="retro"] {
+  --primary-color: #ffb000;
+  --primary-hover: #332600;
+  --primary-light: #ffcc66;
+  --background-color: #0f0e0e;
+  --background-light: #0a0a0a;
+  --text-color: #ffb000;
+  --border-color: #ffb000;
+  --shadow-color: #ffb000;
+  --accent-color: #ff3300;
+}
+
+/* Hacker Theme */
+[data-theme="hacker"] {
+  --primary-color: #00ffff;
+  --primary-hover: #003333;
+  --primary-light: #66ffff;
+  --background-color: #0f0e0e;
+  --background-light: #0a0a0a;
+  --text-color: #00ffff;
+  --border-color: #00ffff;
+  --shadow-color: #00ffff;
+  --accent-color: #ff3300;
+}
+
+/* Neon Theme */
+[data-theme="neon"] {
+  --primary-color: #9d00ff;
+  --primary-hover: #330033;
+  --primary-light: #cc66ff;
+  --background-color: #0f0e0e;
+  --background-light: #0a0a0a;
+  --text-color: #9d00ff;
+  --border-color: #9d00ff;
+  --shadow-color: #9d00ff;
+  --accent-color: #ff3300;
+}
+
 body {
   font-family: 'Share Tech Mono', monospace;
-  background-color: #0f0e0e;
-  color: #00ff00;
+  background-color: var(--background-color);
+  color: var(--text-color);
   margin: 0;
   height: 100vh;
   overflow: hidden;
@@ -39,26 +105,26 @@ form {
 input[type="text"] {
   flex-grow: 1;
   background: transparent;
-  border: 2px solid #00ff00;
+  border: 2px solid var(--border-color);
   border-radius: 0.5rem;
   padding: 0.5rem 1rem;
-  color: #00ff00;
+  color: var(--text-color);
   font-family: 'Share Tech Mono', monospace;
   font-size: 1rem;
-  caret-color: #00ff00;
+  caret-color: var(--text-color);
   transition: border-color 0.3s;
 }
 
 input[type="text"]:focus {
   outline: none;
-  border-color: #66ff66;
+  border-color: var(--primary-light);
 }
 
 button[type="submit"] {
   background: transparent;
-  border: 2px solid #00ff00;
+  border: 2px solid var(--border-color);
   border-radius: 0.5rem;
-  color: #00ff00;
+  color: var(--text-color);
   padding: 0 1.5rem;
   font-family: 'Share Tech Mono', monospace;
   font-size: 1rem;
@@ -67,7 +133,7 @@ button[type="submit"] {
 }
 
 button[type="submit"]:hover {
-  background-color: #003300;
+  background-color: var(--primary-hover);
 }
 
 .tags {
@@ -79,7 +145,7 @@ button[type="submit"]:hover {
 }
 
 .tag {
-  border: 2px solid #00ff00;
+  border: 2px solid var(--border-color);
   border-radius: 9999px;
   padding: 0.25rem 0.75rem;
   cursor: pointer;
@@ -88,22 +154,22 @@ button[type="submit"]:hover {
 }
 
 .tag:hover {
-  background-color: #003300;
+  background-color: var(--primary-hover);
 }
 
 .tag.selected {
-  background-color: #00ff00;
-  color: #0f0e0e;
+  background-color: var(--primary-color);
+  color: var(--background-color);
 }
 
 /* Draggable widget base */
 .draggable {
   position: fixed;
-  background: #0f0e0e;
-  border: 1px solid #00ff00;
+  background: var(--background-color);
+  border: 1px solid var(--border-color);
   border-radius: 20px;
-  box-shadow: 0 0 4px #00ff00;
-  color: #00ff00;
+  box-shadow: 0 0 4px var(--shadow-color);
+  color: var(--text-color);
   user-select: none;
   z-index: 1000;
   max-width: 320px;
@@ -116,10 +182,10 @@ button[type="submit"]:hover {
 .drag-header {
   cursor: move;
   padding: 0.5rem 0.75rem;
-  border-bottom: 1px solid #00ff00;
+  border-bottom: 1px solid var(--border-color);
   font-weight: bold;
   font-size: 1.1rem;
-  background: #0a0a0a;
+  background: var(--background-light);
   border-top-left-radius: 18px;
   border-top-right-radius: 18px;
   display: flex;
@@ -143,8 +209,8 @@ button[type="submit"]:hover {
 
 .toggle-btn, .minimize-btn, .resize-btn {
   background: transparent;
-  border: 1px solid #00ff00;
-  color: #00ff00;
+  border: 1px solid var(--border-color);
+  color: var(--text-color);
   font-size: 0.8rem;
   padding: 0.15rem 0.5rem;
   border-radius: 6px;
@@ -155,7 +221,7 @@ button[type="submit"]:hover {
 }
 
 .toggle-btn:hover, .minimize-btn:hover, .resize-btn:hover {
-  background-color: #003300;
+  background-color: var(--primary-hover);
 }
 
 .analog-clock {
@@ -163,9 +229,9 @@ button[type="submit"]:hover {
   width: 160px;
   height: 160px;
   margin: 0 auto;
-  border: 4px solid #00ff00;
+  border: 4px solid var(--border-color);
   border-radius: 50%;
-  background: #0f0e0e;
+  background: var(--background-color);
   display: none; /* Initial state */
 }
 
@@ -175,7 +241,7 @@ button[type="submit"]:hover {
 
 .hand {
   position: absolute;
-  background: #00ff00;
+  background: var(--primary-color);
   top: 50%;
   left: 50%;
   transform-origin: bottom center;
@@ -198,7 +264,7 @@ button[type="submit"]:hover {
 .hand.second {
   width: 2px;
   height: 70px;
-  background: #ff3300;
+  background: var(--accent-color);
   border-radius: 1px;
 }
 
@@ -206,7 +272,7 @@ button[type="submit"]:hover {
   position: absolute;
   width: 10px;
   height: 10px;
-  background: #00ff00;
+  background: var(--primary-color);
   border-radius: 50%;
   top: 50%;
   left: 50%;
@@ -229,8 +295,8 @@ button[type="submit"]:hover {
 .todo-input {
   flex-grow: 1;
   background: transparent;
-  border: 1px solid #00ff00;
-  color: #00ff00;
+  border: 1px solid var(--border-color);
+  color: var(--text-color);
   padding: 0.3rem 0.5rem;
   border-radius: 4px;
   font-family: 'Share Tech Mono', monospace;
@@ -238,13 +304,13 @@ button[type="submit"]:hover {
 
 .todo-input:focus {
   outline: none;
-  border-color: #66ff66;
+  border-color: var(--primary-light);
 }
 
 .todo-button {
   background: transparent;
-  border: 1px solid #00ff00;
-  color: #00ff00;
+  border: 1px solid var(--border-color);
+  color: var(--text-color);
   padding: 0.3rem 0.8rem;
   border-radius: 4px;
   cursor: pointer;
@@ -253,7 +319,7 @@ button[type="submit"]:hover {
 }
 
 .todo-button:hover {
-  background-color: #003300;
+  background-color: var(--primary-hover);
 }
 
 .todo-item {
@@ -261,7 +327,7 @@ button[type="submit"]:hover {
   align-items: center;
   justify-content: space-between;
   padding: 0.25rem 0;
-  border-bottom: 1px solid #004400;
+  border-bottom: 1px solid var(--primary-hover);
 }
 
 .todo-text {
@@ -271,7 +337,7 @@ button[type="submit"]:hover {
 
 .todo-remove {
   cursor: pointer;
-  color: #ff3300;
+  color: var(--accent-color);
   font-weight: bold;
   margin-left: 0.5rem;
 }
@@ -282,7 +348,7 @@ button[type="submit"]:hover {
 }
 
 .todo-list::-webkit-scrollbar-thumb {
-  background-color: #00ff00;
+  background-color: var(--primary-color);
   border-radius: 3px;
 }
 
@@ -302,28 +368,48 @@ button[type="submit"]:hover {
 }
 
 /* Media controller */
-#mediaController button {
-  background: transparent;
-  border: 1px solid #00ff00;
-  color: #00ff00;
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 1.2rem;
-  padding: 0.3rem 0.6rem;
-  margin: 0 0.25rem;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background-color 0.2s;
-  user-select: none;
-}
-
-#mediaController button:hover {
-  background-color: #003300;
-}
-
 #mediaController {
   display: flex;
   justify-content: center;
   gap: 0.5rem;
+  padding: 1rem;
+}
+
+#mediaController button {
+  background: transparent;
+  border: 2px solid var(--border-color);
+  color: var(--text-color);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 1.2rem;
+  padding: 0.5rem 1rem;
+  margin: 0 0.25rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  user-select: none;
+  min-width: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#mediaController button:hover {
+  background-color: var(--primary-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 2px 8px var(--shadow-color);
+}
+
+#mediaController button:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+#mediaController .widget-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
 }
 
 /* Music player */
@@ -347,11 +433,11 @@ button[type="submit"]:hover {
 }
 
 .minimized-widget {
-  background: #0f0e0e;
-  border: 1px solid #00ff00;
+  background: var(--background-color);
+  border: 1px solid var(--border-color);
   border-radius: 6px 0 0 6px;
   padding: 0.3rem 0.6rem;
-  color: #00ff00;
+  color: var(--text-color);
   cursor: pointer;
   font-family: 'Share Tech Mono', monospace;
   font-size: 0.9rem;
@@ -359,12 +445,12 @@ button[type="submit"]:hover {
   overflow: hidden;
   text-overflow: ellipsis;
   width: 140px;
-  box-shadow: 0 0 4px #00ff00;
+  box-shadow: 0 0 4px var(--shadow-color);
   animation: pixelateIn 0.3s ease forwards;
 }
 
 .minimized-widget:hover {
-  background-color: #003300;
+  background-color: var(--primary-hover);
 }
 
 /* Pixelated animation */
@@ -423,12 +509,6 @@ button[type="submit"]:hover {
   padding: 0;
 }
 
-#mediaController .widget-content {
-  display: flex;
-  justify-content: center;
-  gap: 0.5rem;
-}
-
 .draggable-widget {
   transition: opacity 0.2s ease-in-out;
   opacity: 1;
@@ -445,7 +525,7 @@ button[type="submit"]:hover {
   top: 20px;
   right: 20px;
   background: transparent;
-  border: 2px solid #00ff00;
+  border: 2px solid var(--border-color);
   border-radius: 50%;
   width: 40px;
   height: 40px;
@@ -453,13 +533,13 @@ button[type="submit"]:hover {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  color: #00ff00;
+  color: var(--text-color);
   transition: all 0.3s ease;
   z-index: 2000;
 }
 
 .settings-btn:hover {
-  background-color: #003300;
+  background-color: var(--primary-hover);
   transform: rotate(45deg);
 }
 
@@ -483,8 +563,8 @@ button[type="submit"]:hover {
 }
 
 .settings-content {
-  background: #0f0e0e;
-  border: 2px solid #00ff00;
+  background: var(--background-color);
+  border: 2px solid var(--border-color);
   border-radius: 10px;
   width: 90%;
   max-width: 500px;
@@ -505,19 +585,19 @@ button[type="submit"]:hover {
   align-items: center;
   margin-bottom: 20px;
   padding-bottom: 10px;
-  border-bottom: 1px solid #00ff00;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .settings-header h2 {
   margin: 0;
-  color: #00ff00;
+  color: var(--text-color);
   font-size: 1.5rem;
 }
 
 .close-btn {
   background: transparent;
   border: none;
-  color: #00ff00;
+  color: var(--text-color);
   font-size: 1.5rem;
   cursor: pointer;
   padding: 5px;
@@ -526,7 +606,7 @@ button[type="submit"]:hover {
 }
 
 .close-btn:hover {
-  color: #66ff66;
+  color: var(--primary-light);
 }
 
 .setting-group {
@@ -534,7 +614,7 @@ button[type="submit"]:hover {
 }
 
 .setting-group h3 {
-  color: #00ff00;
+  color: var(--text-color);
   margin: 0 0 10px 0;
   font-size: 1.1rem;
 }
@@ -543,8 +623,8 @@ button[type="submit"]:hover {
 .settings-input {
   width: 100%;
   background: transparent;
-  border: 1px solid #00ff00;
-  color: #00ff00;
+  border: 1px solid var(--border-color);
+  color: var(--text-color);
   padding: 8px;
   border-radius: 4px;
   font-family: 'Share Tech Mono', monospace;
@@ -555,18 +635,18 @@ button[type="submit"]:hover {
 .settings-select:focus,
 .settings-input:focus {
   outline: none;
-  border-color: #66ff66;
+  border-color: var(--primary-light);
 }
 
 .settings-select option {
-  background: #0f0e0e;
-  color: #00ff00;
+  background: var(--background-color);
+  color: var(--text-color);
   padding: 8px;
 }
 
 .settings-select optgroup {
-  background: #0f0e0e;
-  color: #66ff66;
+  background: var(--background-color);
+  color: var(--primary-light);
   font-weight: bold;
 }
 
@@ -583,8 +663,8 @@ button[type="submit"]:hover {
 
 #saveWeatherLocation {
   background: transparent;
-  border: 1px solid #00ff00;
-  color: #00ff00;
+  border: 1px solid var(--border-color);
+  color: var(--text-color);
   padding: 8px 16px;
   border-radius: 4px;
   cursor: pointer;
@@ -594,7 +674,7 @@ button[type="submit"]:hover {
 }
 
 #saveWeatherLocation:hover {
-  background-color: #003300;
+  background-color: var(--primary-hover);
   transform: none;
 }
 
@@ -612,4 +692,520 @@ button[type="submit"]:hover {
 
 #matrixBackground.visible {
   opacity: 0.15;
+}
+
+/* README Widget Styles */
+.readme-content {
+  max-height: 400px;
+  overflow-y: auto;
+  padding-right: 10px;
+}
+
+.readme-content h3 {
+  color: var(--text-color);
+  margin: 0 0 15px 0;
+  font-size: 1.2rem;
+  text-align: center;
+}
+
+.readme-content h4 {
+  color: var(--primary-light);
+  margin: 15px 0 8px 0;
+  font-size: 1rem;
+}
+
+.readme-content ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.readme-content li {
+  color: var(--text-color);
+  margin: 5px 0;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.readme-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.readme-content::-webkit-scrollbar-thumb {
+  background-color: var(--primary-color);
+  border-radius: 3px;
+}
+
+/* Update widget positions */
+#readmeWidget {
+  top: 450px;
+  left: 360px;
+  max-width: 400px;
+  max-height: 500px;
+}
+
+/* Media Player Widget */
+#mediaPlayer {
+  min-width: 320px;
+  max-width: 400px;
+}
+
+#mediaPlayer .widget-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.media-controls {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.media-controls button {
+  background: transparent;
+  border: 2px solid var(--border-color);
+  color: var(--text-color);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 1rem;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  user-select: none;
+  min-width: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.media-controls button:hover {
+  background-color: var(--primary-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 2px 8px var(--shadow-color);
+}
+
+.media-controls button:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+.audio-player {
+  width: 100%;
+  padding: 0.5rem 0;
+}
+
+.audio-player audio {
+  width: 100%;
+  outline: none;
+}
+
+/* Custom audio player styling */
+.audio-player audio::-webkit-media-controls-panel {
+  background-color: var(--background-light);
+}
+
+.audio-player audio::-webkit-media-controls-play-button,
+.audio-player audio::-webkit-media-controls-timeline,
+.audio-player audio::-webkit-media-controls-current-time-display,
+.audio-player audio::-webkit-media-controls-time-remaining-display,
+.audio-player audio::-webkit-media-controls-mute-button,
+.audio-player audio::-webkit-media-controls-volume-slider {
+  filter: invert(1) hue-rotate(90deg);
+}
+
+/* Update widget positions */
+#mediaPlayer {
+  top: 250px;
+  left: 450px;
+}
+
+/* Custom Audio Controls */
+.custom-audio-controls {
+  padding: 10px;
+  border: 1px solid var(--primary-color);
+  border-radius: 4px;
+  margin: 10px 0;
+}
+
+.time-display {
+  font-family: 'Share Tech Mono', monospace;
+  color: var(--text-color);
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.seek-bar-container {
+  margin: 10px 0;
+}
+
+.seek-bar, .volume-bar {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 4px;
+  background: var(--background-light);
+  border: 1px solid var(--primary-color);
+  border-radius: 2px;
+  outline: none;
+}
+
+.seek-bar::-webkit-slider-thumb, .volume-bar::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 12px;
+  height: 12px;
+  background: var(--primary-color);
+  border: 1px solid var(--primary-color);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.seek-bar::-webkit-slider-thumb:hover, .volume-bar::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+  box-shadow: 0 0 10px var(--primary-color);
+}
+
+.volume-control {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.volume-control span {
+  font-family: 'Share Tech Mono', monospace;
+  color: var(--text-color);
+  min-width: 30px;
+}
+
+/* Media File Selection */
+.media-file-select {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border-top: 1px solid var(--primary-color);
+  margin-top: 10px;
+}
+
+.file-controls,
+.folder-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  justify-content: center;
+}
+
+.file-controls button,
+.folder-controls button {
+  width: 100%;
+  padding: 8px 15px;
+  background: transparent;
+  border: 1px solid var(--primary-color);
+  color: var(--text-color);
+  font-family: 'Share Tech Mono', monospace;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+}
+
+.file-controls button:hover,
+.folder-controls button:hover {
+  background: var(--primary-color);
+  color: var(--background-color);
+}
+
+.media-file-name {
+  font-family: 'Share Tech Mono', monospace;
+  color: var(--text-color);
+  font-size: 0.9em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: block;
+  padding: 0 10px;
+}
+
+/* Update existing media player styles */
+#mediaPlayer {
+  min-width: 300px;
+  max-width: 400px;
+}
+
+.media-controls {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  padding: 15px;
+  border-bottom: 1px solid var(--primary-color);
+}
+
+.media-controls button {
+  min-width: 80px;
+  padding: 8px 15px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.9em;
+  text-transform: uppercase;
+  background: transparent;
+  border: 2px solid var(--primary-color);
+  color: var(--text-color);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.media-controls button:hover {
+  background: var(--primary-color);
+  color: var(--background-color);
+  box-shadow: 0 0 10px var(--primary-color);
+}
+
+.media-controls button:active {
+  transform: scale(0.95);
+}
+
+/* Media file selection buttons */
+.media-file-select .toggle-btn {
+  background: transparent;
+  border: 2px solid var(--primary-color);
+  color: var(--text-color);
+  padding: 6px 12px;
+  font-size: 0.9em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.media-file-select .toggle-btn:hover {
+  background: var(--primary-color);
+  color: var(--background-color);
+  box-shadow: 0 0 10px var(--primary-color);
+}
+
+.media-file-select .toggle-btn:active {
+  transform: scale(0.95);
+}
+
+.now-playing {
+  text-align: center;
+  padding: 8px;
+  margin: 5px 0;
+  border-top: 1px solid var(--primary-color);
+  border-bottom: 1px solid var(--primary-color);
+}
+
+/* Playlist Styles */
+.playlist-container {
+  margin: 10px 0;
+  border: 1px solid var(--primary-color);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.playlist-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: var(--background-light);
+  border-bottom: 1px solid var(--primary-color);
+}
+
+.playlist-header h3 {
+  margin: 0;
+  font-size: 1rem;
+  color: var(--text-color);
+}
+
+.playlist {
+  max-height: 200px;
+  overflow-y: auto;
+  background: var(--background-color);
+}
+
+.playlist-item {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--primary-hover);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.playlist-item:hover {
+  background: var(--primary-hover);
+}
+
+.playlist-item.active {
+  background: var(--primary-hover);
+  border-left: 3px solid var(--primary-color);
+}
+
+.playlist-item-title {
+  flex: 1;
+  font-size: 0.9rem;
+  color: var(--text-color);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.playlist-item-controls {
+  display: flex;
+  gap: 8px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.playlist-item:hover .playlist-item-controls {
+  opacity: 1;
+}
+
+.playlist-item-controls button {
+  background: transparent;
+  border: 1px solid var(--primary-color);
+  color: var(--text-color);
+  padding: 2px 6px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.playlist-item-controls button:hover {
+  background: var(--primary-color);
+  color: var(--background-color);
+}
+
+.playlist::-webkit-scrollbar {
+  width: 6px;
+}
+
+.playlist::-webkit-scrollbar-thumb {
+  background-color: var(--primary-color);
+  border-radius: 3px;
+}
+
+#clearPlaylistBtn {
+  padding: 4px 8px;
+  font-size: 0.8rem;
+  background: transparent;
+  border: 1px solid var(--primary-color);
+  color: var(--text-color);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+#clearPlaylistBtn:hover {
+  background: var(--primary-color);
+  color: var(--background-color);
+}
+
+/* Custom Scrollbar Styles */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background-color);
+  border: 1px solid var(--border-color);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--primary-color);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-light);
+}
+
+/* For Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary-color) var(--background-color);
+}
+
+/* Update playlist scrollbar specifically */
+.playlist::-webkit-scrollbar {
+  width: 8px;
+}
+
+.playlist::-webkit-scrollbar-track {
+  background: var(--background-color);
+  border: 1px solid var(--border-color);
+}
+
+.playlist::-webkit-scrollbar-thumb {
+  background: var(--primary-color);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+}
+
+.playlist::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-light);
+}
+
+/* For Firefox playlist */
+.playlist {
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary-color) var(--background-color);
+}
+
+/* Update todo list scrollbar */
+.todo-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.todo-list::-webkit-scrollbar-track {
+  background: var(--background-color);
+  border: 1px solid var(--border-color);
+}
+
+.todo-list::-webkit-scrollbar-thumb {
+  background: var(--primary-color);
+  border: 1px solid var(--border-color);
+  border-radius: 3px;
+}
+
+.todo-list::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-light);
+}
+
+/* For Firefox todo list */
+.todo-list {
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary-color) var(--background-color);
+}
+
+/* Update readme content scrollbar */
+.readme-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.readme-content::-webkit-scrollbar-track {
+  background: var(--background-color);
+  border: 1px solid var(--border-color);
+}
+
+.readme-content::-webkit-scrollbar-thumb {
+  background: var(--primary-color);
+  border: 1px solid var(--border-color);
+  border-radius: 3px;
+}
+
+.readme-content::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-light);
+}
+
+/* For Firefox readme content */
+.readme-content {
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary-color) var(--background-color);
 } 

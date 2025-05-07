@@ -56,15 +56,30 @@ function selectTag(tag) {
 function parseInput(input) {
   const parts = input.trim().split(/\s+/);
   const first = parts[0].toLowerCase();
+  const second = parts[1]?.toLowerCase();
+  
+  // Handle NT command
+  if (first === 'nt' && second && searchEngines[second]) {
+    return {
+      engine: second,
+      query: parts.slice(2).join(' '),
+      newTab: true
+    };
+  }
+  
+  // Handle regular search engine commands
   if (searchEngines[first]) {
     return {
       engine: first,
-      query: parts.slice(1).join(' ')
+      query: parts.slice(1).join(' '),
+      newTab: false
     };
   }
+  
   return {
     engine: selectedEngine,
-    query: input.trim()
+    query: input.trim(),
+    newTab: false
   };
 }
 
@@ -72,10 +87,15 @@ searchForm.addEventListener('submit', e => {
   e.preventDefault();
   const input = searchInput.value.trim();
   if (!input) return;
-  const { engine, query } = parseInput(input);
+  const { engine, query, newTab } = parseInput(input);
   if (!query) return;
   const url = searchEngines[engine](query);
-  window.location.href = url;
+  
+  if (newTab) {
+    window.open(url, '_blank');
+  } else {
+    window.location.href = url;
+  }
 });
 
 // Draggable logic
@@ -206,8 +226,8 @@ const widgets = [
   'todoWidget',
   'weatherWidget',
   'screensaverWidget',
-  'mediaController',
-  'musicPlayer'
+  'mediaPlayer',
+  'readmeWidget'
 ];
 
 // Minimize and resize logic
@@ -295,9 +315,10 @@ async function initializeWidgets() {
 
   // Wait for all widget states to be restored
   await new Promise(resolve => {
-    chrome.storage.local.get(['widgetPositions', 'widgetStates'], (result) => {
+    chrome.storage.local.get(['widgetPositions', 'widgetStates', 'widgetSizes'], (result) => {
       const positions = result.widgetPositions || {};
       const states = result.widgetStates || {};
+      const sizes = result.widgetSizes || {};
       
       widgets.forEach(id => {
         const widget = document.getElementById(id);
@@ -305,6 +326,12 @@ async function initializeWidgets() {
         if (positions[id]) {
           widget.style.left = positions[id].left;
           widget.style.top = positions[id].top;
+        }
+        
+        // Restore size
+        if (sizes[id]) {
+          widget.style.width = `${sizes[id].w}px`;
+          widget.style.height = `${sizes[id].h}px`;
         }
         
         // Restore minimized state
@@ -320,6 +347,9 @@ async function initializeWidgets() {
     });
   });
 
+  // Restore playlist data
+  await restorePlaylistData();
+
   // Small delay to ensure smooth transition
   await new Promise(resolve => setTimeout(resolve, 50));
 
@@ -334,12 +364,10 @@ async function initializeWidgets() {
 
 // Focus management
 function ensureSearchFocus() {
-  // Direct DOM manipulation to ensure focus
-  searchInput.style.display = 'none';
-  searchInput.offsetHeight; // Force reflow
-  searchInput.style.display = '';
-  searchInput.focus();
-  searchInput.select();
+  // Only focus search if no other input is focused
+  if (document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+    searchInput.focus();
+  }
 }
 
 // Initialize on page load
@@ -351,13 +379,8 @@ window.addEventListener('load', () => {
   setInterval(updateClocks, 1000);
   updateClocks();
   
-  // Immediate focus attempt
+  // Initial focus attempt
   ensureSearchFocus();
-
-  // Multiple delayed focus attempts
-  [100, 500, 1000, 2000].forEach(delay => {
-    setTimeout(ensureSearchFocus, delay);
-  });
 
   // Handle visibility changes
   document.addEventListener('visibilitychange', () => {
@@ -369,11 +392,16 @@ window.addEventListener('load', () => {
   // Handle window focus
   window.addEventListener('focus', ensureSearchFocus);
 
-  // Handle any click on the page
+  // Handle clicks on the page
   document.addEventListener('click', (e) => {
-    if (e.target !== searchInput) {
-      ensureSearchFocus();
+    // Don't steal focus if clicking on inputs or buttons
+    if (e.target.tagName === 'INPUT' || 
+        e.target.tagName === 'TEXTAREA' || 
+        e.target.tagName === 'BUTTON' ||
+        e.target.closest('.widget-content')) {
+      return;
     }
+    ensureSearchFocus();
   });
 });
 
@@ -514,39 +542,59 @@ const saveWeatherLocation = document.getElementById('saveWeatherLocation');
 function saveSettings() {
   const settings = {
     timezone: timezoneSelect.value,
-    weatherLocation: weatherLocation.value.trim()
+    weatherLocation: weatherLocation.value.trim(),
+    theme: document.getElementById('themeSelect').value
   };
   
   chrome.storage.local.set({ settings }, () => {
     currentTimezone = settings.timezone;
-    updateClocks();
-    if (settings.weatherLocation) {
-      fetchWeather(settings.weatherLocation);
-    }
+    updateClockTimezone(settings.timezone);
+    fetchWeather(settings.weatherLocation);
+    applyTheme(settings.theme);
   });
 }
 
 // Function to load settings
 function loadSettings() {
-  chrome.storage.local.get(['settings'], (result) => {
-    if (result.settings) {
-      const settings = result.settings;
-      
-      // Set timezone
-      if (settings.timezone) {
-        timezoneSelect.value = settings.timezone;
-        currentTimezone = settings.timezone;
-      }
-      
-      // Set weather location
-      if (settings.weatherLocation) {
-        weatherLocation.value = settings.weatherLocation;
-        fetchWeather(settings.weatherLocation);
-      }
-      
-      updateClocks();
-    }
+  chrome.storage.local.get('settings', (data) => {
+    const settings = data.settings || {
+      timezone: 'Asia/Kolkata',
+      weatherLocation: 'Kolkata',
+      theme: 'matrix'
+    };
+    
+    timezoneSelect.value = settings.timezone;
+    weatherLocation.value = settings.weatherLocation;
+    document.getElementById('themeSelect').value = settings.theme;
+    
+    updateClockTimezone(settings.timezone);
+    fetchWeather(settings.weatherLocation);
+    applyTheme(settings.theme);
   });
+}
+
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  
+  // Update matrix background color based on theme
+  const matrixCanvas = document.getElementById('matrixBackground');
+  if (matrixCanvas) {
+    const ctx = matrixCanvas.getContext('2d');
+    const themeColors = {
+      matrix: '#00ff00',
+      cyberpunk: '#ff00ff',
+      retro: '#ffb000',
+      hacker: '#00ffff',
+      neon: '#9d00ff'
+    };
+    
+    // Update the matrix color
+    ctx.fillStyle = themeColors[theme] || '#00ff00';
+    
+    // Clear the canvas and redraw with new color
+    ctx.clearRect(0, 0, matrixCanvas.width, matrixCanvas.height);
+    drawMatrix();
+  }
 }
 
 // Settings modal event listeners
@@ -594,6 +642,11 @@ saveWeatherLocation.addEventListener('click', () => {
   if (location) {
     saveSettings();
   }
+});
+
+// Add event listener for theme select
+document.getElementById('themeSelect').addEventListener('change', () => {
+  saveSettings();
 });
 
 // Todo List Logic
@@ -784,33 +837,323 @@ function resetInactivityTimer() {
 });
 resetInactivityTimer();
 
-// Media Controller Logic
+// Media Player Logic
 const audioPlayer = document.getElementById('audioPlayer');
 const playBtn = document.getElementById('playBtn');
 const pauseBtn = document.getElementById('pauseBtn');
 const stopBtn = document.getElementById('stopBtn');
+const seekBar = document.getElementById('seekBar');
+const volumeBar = document.getElementById('volumeBar');
+const currentTimeSpan = document.getElementById('currentTime');
+const durationSpan = document.getElementById('duration');
+const mediaFileInput = document.getElementById('mediaFileInput');
+const selectMediaBtn = document.getElementById('selectMediaBtn');
+const selectedMediaName = document.getElementById('selectedMediaName');
+const folderInput = document.getElementById('folderInput');
+const selectFolderBtn = document.getElementById('selectFolderBtn');
+const playlist = document.getElementById('playlist');
+const clearPlaylistBtn = document.getElementById('clearPlaylistBtn');
 
-playBtn.addEventListener('click', () => {
-  audioPlayer.play();
+let mediaFiles = [];
+let currentTrackIndex = 0;
+let isDragging = false;
+let isLoading = false;
+let mediaUrls = []; // Store URLs for the media files
+let isPlaying = false;
+
+// Format time in MM:SS
+function formatTime(seconds) {
+  if (isNaN(seconds) || !isFinite(seconds)) return "00:00";
+  const minutes = Math.floor(seconds / 60);
+  seconds = Math.floor(seconds % 60);
+  return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+}
+
+// Update time display
+function updateTimeDisplay() {
+  if (audioPlayer.readyState >= 1) {
+    currentTimeSpan.textContent = formatTime(audioPlayer.currentTime);
+    durationSpan.textContent = formatTime(audioPlayer.duration);
+  }
+}
+
+// Update seek bar
+function updateSeekBar() {
+  if (!isDragging && audioPlayer.readyState >= 1) {
+    const percentage = (audioPlayer.currentTime / audioPlayer.duration) * 100;
+    seekBar.value = percentage;
+  }
+}
+
+// Create playlist item
+function createPlaylistItem(file, index) {
+  const item = document.createElement('div');
+  item.className = 'playlist-item';
+  if (index === currentTrackIndex) {
+    item.classList.add('active');
+  }
+
+  const title = document.createElement('div');
+  title.className = 'playlist-item-title';
+  title.textContent = file.name;
+
+  const controls = document.createElement('div');
+  controls.className = 'playlist-item-controls';
+
+  const playButton = document.createElement('button');
+  playButton.textContent = 'PLAY';
+  playButton.onclick = async (e) => {
+    e.stopPropagation();
+    await playTrack(index);
+  };
+
+  const removeButton = document.createElement('button');
+  removeButton.textContent = '×';
+  removeButton.onclick = async (e) => {
+    e.stopPropagation();
+    await removeTrack(index);
+  };
+
+  controls.appendChild(playButton);
+  controls.appendChild(removeButton);
+
+  item.appendChild(title);
+  item.appendChild(controls);
+
+  item.onclick = async () => {
+    await playTrack(index);
+  };
+
+  return item;
+}
+
+// Update playlist display
+function updatePlaylist() {
+  playlist.innerHTML = '';
+  mediaFiles.forEach((file, index) => {
+    playlist.appendChild(createPlaylistItem(file, index));
+  });
+}
+
+// Play specific track
+async function playTrack(index) {
+  if (index >= 0 && index < mediaFiles.length) {
+    try {
+      isLoading = true;
+      currentTrackIndex = index;
+      const file = mediaFiles[index];
+      
+      // Only create new URL if we don't have one
+      if (!mediaUrls[index]) {
+        mediaUrls[index] = URL.createObjectURL(file);
+      }
+      
+      audioPlayer.src = mediaUrls[index];
+      await audioPlayer.load();
+      selectedMediaName.textContent = `${file.name} (${index + 1} of ${mediaFiles.length})`;
+      await audioPlayer.play();
+      isPlaying = true;
+      updatePlaylist();
+      await savePlaylistData();
+    } catch (error) {
+      console.error('Error playing track:', error);
+      selectedMediaName.textContent = 'Error playing track';
+    } finally {
+      isLoading = false;
+    }
+  }
+}
+
+// Remove track from playlist
+async function removeTrack(index) {
+  if (index >= 0 && index < mediaFiles.length) {
+    // Clean up the URL
+    if (mediaUrls[index]) {
+      URL.revokeObjectURL(mediaUrls[index]);
+    }
+    mediaUrls.splice(index, 1);
+    mediaFiles.splice(index, 1);
+    
+    if (mediaFiles.length === 0) {
+      audioPlayer.pause();
+      audioPlayer.src = '';
+      selectedMediaName.textContent = 'No media selected';
+      currentTrackIndex = -1;
+      isPlaying = false;
+    } else if (index === currentTrackIndex) {
+      await playTrack(Math.min(index, mediaFiles.length - 1));
+    } else if (index < currentTrackIndex) {
+      currentTrackIndex--;
+    }
+    updatePlaylist();
+    await savePlaylistData();
+  }
+}
+
+// Clear playlist
+async function clearPlaylist() {
+  // Clean up all URLs
+  mediaUrls.forEach(url => {
+    if (url) URL.revokeObjectURL(url);
+  });
+  mediaUrls = [];
+  mediaFiles = [];
+  currentTrackIndex = -1;
+  isPlaying = false;
+  audioPlayer.pause();
+  audioPlayer.src = '';
+  selectedMediaName.textContent = 'No media selected';
+  updatePlaylist();
+  await chrome.storage.local.remove('playlistData');
+}
+
+// Handle single file selection
+selectMediaBtn.addEventListener('click', () => {
+  mediaFileInput.click();
 });
+
+// Handle folder selection
+selectFolderBtn.addEventListener('click', () => {
+  folderInput.click();
+});
+
+// Handle folder selection
+folderInput.addEventListener('change', async (e) => {
+  const files = Array.from(e.target.files).filter(file => file.type.startsWith('audio/'));
+  if (files.length > 0) {
+    // Clean up existing URLs
+    mediaUrls.forEach(url => {
+      if (url) URL.revokeObjectURL(url);
+    });
+    mediaUrls = [];
+    mediaFiles = files;
+    // Create URLs for all files
+    mediaFiles.forEach((file, index) => {
+      mediaUrls[index] = URL.createObjectURL(file);
+    });
+    currentTrackIndex = 0;
+    await playTrack(0);
+    await savePlaylistData();
+  }
+});
+
+// Clear playlist button
+clearPlaylistBtn.addEventListener('click', clearPlaylist);
+
+// Handle audio ended
+audioPlayer.addEventListener('ended', async () => {
+  if (mediaFiles.length > 0) {
+    const nextIndex = (currentTrackIndex + 1) % mediaFiles.length;
+    await playTrack(nextIndex);
+  }
+});
+
+// Handle seek bar changes
+seekBar.addEventListener('input', () => {
+  if (audioPlayer.readyState >= 1) {
+    isDragging = true;
+    const time = (seekBar.value / 100) * audioPlayer.duration;
+    if (isFinite(time)) {
+      audioPlayer.currentTime = time;
+    }
+  }
+});
+
+seekBar.addEventListener('change', () => {
+  if (audioPlayer.readyState >= 1) {
+    isDragging = false;
+    const time = (seekBar.value / 100) * audioPlayer.duration;
+    if (isFinite(time)) {
+      audioPlayer.currentTime = time;
+    }
+  }
+});
+
+// Handle volume changes
+volumeBar.addEventListener('input', () => {
+  audioPlayer.volume = volumeBar.value / 100;
+});
+
+// Update time and seek bar during playback
+audioPlayer.addEventListener('timeupdate', () => {
+  updateTimeDisplay();
+  updateSeekBar();
+});
+
+// Handle audio loaded
+audioPlayer.addEventListener('loadedmetadata', () => {
+  updateTimeDisplay();
+  updateSeekBar();
+  isLoading = false;
+});
+
+// Handle audio can play
+audioPlayer.addEventListener('canplay', () => {
+  updateTimeDisplay();
+  updateSeekBar();
+});
+
+// Handle audio errors
+audioPlayer.addEventListener('error', (e) => {
+  console.error('Audio error:', e);
+  selectedMediaName.textContent = 'Error loading media';
+  isLoading = false;
+});
+
+// Play button
+playBtn.addEventListener('click', async () => {
+  if (!isLoading && audioPlayer.readyState >= 1) {
+    try {
+      if (!isPlaying) {
+        await audioPlayer.play();
+        isPlaying = true;
+      }
+    } catch (error) {
+      console.error('Error playing:', error);
+    }
+  }
+});
+
+// Pause button
 pauseBtn.addEventListener('click', () => {
-  audioPlayer.pause();
+  if (!isLoading && audioPlayer.readyState >= 1) {
+    audioPlayer.pause();
+    isPlaying = false;
+  }
 });
+
+// Stop button
 stopBtn.addEventListener('click', () => {
-  audioPlayer.pause();
-  audioPlayer.currentTime = 0;
+  if (!isLoading && audioPlayer.readyState >= 1) {
+    audioPlayer.pause();
+    audioPlayer.currentTime = 0;
+    isPlaying = false;
+  }
 });
 
 // Resize logic
 function resizeWidget(widget) {
   const currentWidth = widget.offsetWidth;
   const currentHeight = widget.offsetHeight;
-  // Cycle sizes: small, medium, large
-  const sizes = [
-    { w: 240, h: 180 },
-    { w: 320, h: 240 },
-    { w: 400, h: 320 }
-  ];
+  
+  // Define size presets for different widgets
+  const sizePresets = {
+    mediaPlayer: [
+      { w: 320, h: 400 },  // Small
+      { w: 400, h: 500 },  // Medium
+      { w: 480, h: 600 }   // Large
+    ],
+    default: [
+      { w: 240, h: 180 },  // Small
+      { w: 320, h: 240 },  // Medium
+      { w: 400, h: 320 }   // Large
+    ]
+  };
+
+  // Get the appropriate size preset for this widget
+  const sizes = sizePresets[widget.id] || sizePresets.default;
+  
+  // Find the next size
   let nextSizeIndex = 0;
   for (let i = 0; i < sizes.length; i++) {
     if (Math.abs(currentWidth - sizes[i].w) < 10 && Math.abs(currentHeight - sizes[i].h) < 10) {
@@ -818,8 +1161,37 @@ function resizeWidget(widget) {
       break;
     }
   }
-  widget.style.width = sizes[nextSizeIndex].w + 'px';
-  widget.style.height = sizes[nextSizeIndex].h + 'px';
+
+  // Apply the new size
+  const newSize = sizes[nextSizeIndex];
+  widget.style.width = `${newSize.w}px`;
+  widget.style.height = `${newSize.h}px`;
+
+  // Save the new size
+  saveWidgetSize(widget.id, newSize);
+}
+
+// Function to save widget size
+function saveWidgetSize(widgetId, size) {
+  chrome.storage.local.get(['widgetSizes'], (result) => {
+    const sizes = result.widgetSizes || {};
+    sizes[widgetId] = size;
+    chrome.storage.local.set({ widgetSizes: sizes });
+  });
+}
+
+// Function to restore widget sizes
+function restoreWidgetSizes() {
+  chrome.storage.local.get(['widgetSizes'], (result) => {
+    const sizes = result.widgetSizes || {};
+    widgets.forEach(id => {
+      const widget = document.getElementById(id);
+      if (sizes[id]) {
+        widget.style.width = `${sizes[id].w}px`;
+        widget.style.height = `${sizes[id].h}px`;
+      }
+    });
+  });
 }
 
 // Matrix Background Logic
@@ -844,10 +1216,19 @@ let matrixDrops = Array(matrixColumns).fill(1);
 
 // Draw matrix effect
 function drawMatrix() {
+  const theme = document.documentElement.getAttribute('data-theme') || 'matrix';
+  const themeColors = {
+    matrix: '#00ff00',
+    cyberpunk: '#ff00ff',
+    retro: '#ffb000',
+    hacker: '#00ffff',
+    neon: '#9d00ff'
+  };
+  
   matrixCtx.fillStyle = 'rgba(0, 0, 0, 0.05)';
   matrixCtx.fillRect(0, 0, matrixCanvas.width, matrixCanvas.height);
   
-  matrixCtx.fillStyle = '#00ff00';
+  matrixCtx.fillStyle = themeColors[theme] || '#00ff00';
   matrixCtx.font = matrixFontSize + 'px Share Tech Mono';
   
   for (let i = 0; i < matrixDrops.length; i++) {
@@ -894,4 +1275,173 @@ window.addEventListener('online', updateMatrixStatus);
 window.addEventListener('offline', updateMatrixStatus);
 
 // Initial check
-updateMatrixStatus(); 
+updateMatrixStatus();
+
+// Add this function to handle file paths
+async function getFileFromPath(path) {
+  try {
+    const response = await fetch(path);
+    const blob = await response.blob();
+    return new File([blob], path.split('/').pop(), { type: blob.type });
+  } catch (error) {
+    console.error('Error getting file:', error);
+    return null;
+  }
+}
+
+// Update savePlaylistData function
+async function savePlaylistData() {
+  const playlistData = {
+    files: mediaFiles.map(file => ({
+      name: file.name,
+      type: file.type,
+      lastModified: file.lastModified,
+      size: file.size,
+      path: file.path || file.webkitRelativePath || file.name // Save the file path
+    })),
+    currentTrackIndex: currentTrackIndex,
+    isPlaying: isPlaying
+  };
+  
+  try {
+    await chrome.storage.local.set({ playlistData });
+  } catch (error) {
+    console.error('Error saving playlist:', error);
+  }
+}
+
+// Update restorePlaylistData function
+async function restorePlaylistData() {
+  try {
+    const result = await chrome.storage.local.get('playlistData');
+    const playlistData = result.playlistData;
+    
+    if (playlistData && playlistData.files.length > 0) {
+      // Clear existing data
+      mediaUrls.forEach(url => {
+        if (url) URL.revokeObjectURL(url);
+      });
+      mediaUrls = [];
+      mediaFiles = [];
+      
+      // Try to restore files from paths
+      for (const fileData of playlistData.files) {
+        try {
+          const file = await getFileFromPath(fileData.path);
+          if (file) {
+            mediaFiles.push(file);
+            mediaUrls.push(URL.createObjectURL(file));
+          }
+        } catch (error) {
+          console.error('Error restoring file:', error);
+        }
+      }
+      
+      // Restore the playlist display
+      currentTrackIndex = playlistData.currentTrackIndex;
+      updatePlaylist();
+      
+      // Update the media name display
+      if (currentTrackIndex >= 0 && currentTrackIndex < mediaFiles.length) {
+        selectedMediaName.textContent = `${mediaFiles[currentTrackIndex].name} (${currentTrackIndex + 1} of ${mediaFiles.length})`;
+      }
+    }
+  } catch (error) {
+    console.error('Error restoring playlist:', error);
+  }
+}
+
+// Update file selection handlers to save paths
+mediaFileInput.addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  if (file) {
+    // Clean up existing URLs
+    mediaUrls.forEach(url => {
+      if (url) URL.revokeObjectURL(url);
+    });
+    mediaUrls = [];
+    mediaFiles = [file];
+    mediaUrls[0] = URL.createObjectURL(file);
+    currentTrackIndex = 0;
+    await playTrack(0);
+    await savePlaylistData();
+  }
+});
+
+folderInput.addEventListener('change', async (e) => {
+  const files = Array.from(e.target.files).filter(file => file.type.startsWith('audio/'));
+  if (files.length > 0) {
+    // Clean up existing URLs
+    mediaUrls.forEach(url => {
+      if (url) URL.revokeObjectURL(url);
+    });
+    mediaUrls = [];
+    mediaFiles = files;
+    // Create URLs for all files
+    mediaFiles.forEach((file, index) => {
+      mediaUrls[index] = URL.createObjectURL(file);
+    });
+    currentTrackIndex = 0;
+    await playTrack(0);
+    await savePlaylistData();
+  }
+});
+
+// Update initializeWidgets to handle playlist restoration
+async function initializeWidgets() {
+  // Hide all widgets initially and add loading state
+  widgets.forEach(id => {
+    const widget = document.getElementById(id);
+    widget.style.visibility = 'hidden';
+    widget.style.opacity = '0';
+    widget.classList.add('loading');
+  });
+
+  // Wait for all widget states to be restored
+  await new Promise(resolve => {
+    chrome.storage.local.get(['widgetPositions', 'widgetStates', 'widgetSizes'], (result) => {
+      const positions = result.widgetPositions || {};
+      const states = result.widgetStates || {};
+      const sizes = result.widgetSizes || {};
+      
+      widgets.forEach(id => {
+        const widget = document.getElementById(id);
+        // Restore position
+        if (positions[id]) {
+          widget.style.left = positions[id].left;
+          widget.style.top = positions[id].top;
+        }
+        
+        // Restore size
+        if (sizes[id]) {
+          widget.style.width = `${sizes[id].w}px`;
+          widget.style.height = `${sizes[id].h}px`;
+        }
+        
+        // Restore minimized state
+        if (states[id] && states[id].minimized) {
+          minimizeWidget(widget);
+        }
+
+        // Make widget draggable
+        const header = widget.querySelector('.drag-header');
+        makeDraggable(widget, header);
+      });
+      resolve();
+    });
+  });
+
+  // Restore playlist data
+  await restorePlaylistData();
+
+  // Small delay to ensure smooth transition
+  await new Promise(resolve => setTimeout(resolve, 50));
+
+  // Show widgets with fade-in effect
+  widgets.forEach(id => {
+    const widget = document.getElementById(id);
+    widget.classList.remove('loading');
+    widget.style.visibility = 'visible';
+    widget.style.opacity = '1';
+  });
+} 
