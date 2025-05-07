@@ -1,0 +1,615 @@
+body {
+  font-family: 'Share Tech Mono', monospace;
+  background-color: #0f0e0e;
+  color: #00ff00;
+  margin: 0;
+  height: 100vh;
+  overflow: hidden;
+  user-select: none;
+}
+
+/* Center container for search */
+#searchContainer {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  max-width: 700px;
+  width: 90vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  z-index: 10;
+}
+
+h1 {
+  font-weight: bold;
+  font-size: 2rem;
+  margin: 0;
+  user-select: none;
+}
+
+form {
+  width: 100%;
+  display: flex;
+  gap: 0.75rem;
+}
+
+input[type="text"] {
+  flex-grow: 1;
+  background: transparent;
+  border: 2px solid #00ff00;
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+  color: #00ff00;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 1rem;
+  caret-color: #00ff00;
+  transition: border-color 0.3s;
+}
+
+input[type="text"]:focus {
+  outline: none;
+  border-color: #66ff66;
+}
+
+button[type="submit"] {
+  background: transparent;
+  border: 2px solid #00ff00;
+  border-radius: 0.5rem;
+  color: #00ff00;
+  padding: 0 1.5rem;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+button[type="submit"]:hover {
+  background-color: #003300;
+}
+
+.tags {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  user-select: none;
+}
+
+.tag {
+  border: 2px solid #00ff00;
+  border-radius: 9999px;
+  padding: 0.25rem 0.75rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.3s;
+}
+
+.tag:hover {
+  background-color: #003300;
+}
+
+.tag.selected {
+  background-color: #00ff00;
+  color: #0f0e0e;
+}
+
+/* Draggable widget base */
+.draggable {
+  position: fixed;
+  background: #0f0e0e;
+  border: 1px solid #00ff00;
+  border-radius: 20px;
+  box-shadow: 0 0 4px #00ff00;
+  color: #00ff00;
+  user-select: none;
+  z-index: 1000;
+  max-width: 320px;
+  width: 90vw;
+  display: flex;
+  flex-direction: column;
+  transition: width 0.3s ease, height 0.3s ease;
+}
+
+.drag-header {
+  cursor: move;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid #00ff00;
+  font-weight: bold;
+  font-size: 1.1rem;
+  background: #0a0a0a;
+  border-top-left-radius: 18px;
+  border-top-right-radius: 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.widget-content {
+  padding: 0.75rem 1rem 1rem 1rem;
+  overflow: auto;
+}
+
+/* Clock styles */
+.clock {
+  font-size: 2rem;
+  text-align: center;
+  letter-spacing: 0.1em;
+  user-select: text;
+}
+
+.toggle-btn, .minimize-btn, .resize-btn {
+  background: transparent;
+  border: 1px solid #00ff00;
+  color: #00ff00;
+  font-size: 0.8rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: 'Share Tech Mono', monospace;
+  transition: background-color 0.2s;
+  user-select: none;
+}
+
+.toggle-btn:hover, .minimize-btn:hover, .resize-btn:hover {
+  background-color: #003300;
+}
+
+.analog-clock {
+  position: relative;
+  width: 160px;
+  height: 160px;
+  margin: 0 auto;
+  border: 4px solid #00ff00;
+  border-radius: 50%;
+  background: #0f0e0e;
+  display: none; /* Initial state */
+}
+
+.analog-clock.visible {
+  display: block;
+}
+
+.hand {
+  position: absolute;
+  background: #00ff00;
+  top: 50%;
+  left: 50%;
+  transform-origin: bottom center;
+  transform: translate(-50%, -100%) rotate(0deg);
+  transition: transform 0.1s ease-in-out;
+}
+
+.hand.hour {
+  width: 6px;
+  height: 40px;
+  border-radius: 3px;
+}
+
+.hand.minute {
+  width: 4px;
+  height: 60px;
+  border-radius: 2px;
+}
+
+.hand.second {
+  width: 2px;
+  height: 70px;
+  background: #ff3300;
+  border-radius: 1px;
+}
+
+.center-dot {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: #00ff00;
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Todo styles */
+.todo-list {
+  max-height: 200px;
+  overflow-y: auto;
+  margin-top: 0.75rem;
+}
+
+.todo-input-container {
+  display: flex;
+  padding-top: 0.5rem;
+  gap: 0.5rem;
+}
+
+.todo-input {
+  flex-grow: 1;
+  background: transparent;
+  border: 1px solid #00ff00;
+  color: #00ff00;
+  padding: 0.3rem 0.5rem;
+  border-radius: 4px;
+  font-family: 'Share Tech Mono', monospace;
+}
+
+.todo-input:focus {
+  outline: none;
+  border-color: #66ff66;
+}
+
+.todo-button {
+  background: transparent;
+  border: 1px solid #00ff00;
+  color: #00ff00;
+  padding: 0.3rem 0.8rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: 'Share Tech Mono', monospace;
+  transition: background-color 0.2s;
+}
+
+.todo-button:hover {
+  background-color: #003300;
+}
+
+.todo-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.25rem 0;
+  border-bottom: 1px solid #004400;
+}
+
+.todo-text {
+  flex-grow: 1;
+  user-select: text;
+}
+
+.todo-remove {
+  cursor: pointer;
+  color: #ff3300;
+  font-weight: bold;
+  margin-left: 0.5rem;
+}
+
+/* Scrollbar styling */
+.todo-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.todo-list::-webkit-scrollbar-thumb {
+  background-color: #00ff00;
+  border-radius: 3px;
+}
+
+/* Weather widget */
+#weatherWidget .weather-info {
+  font-size: 1rem;
+  line-height: 1.3;
+}
+
+/* Screensaver */
+#screensaverCanvas {
+  background:#000;
+  border-radius: 10px;
+  width: 100%;
+  height: 140px;
+  display: block;
+}
+
+/* Media controller */
+#mediaController button {
+  background: transparent;
+  border: 1px solid #00ff00;
+  color: #00ff00;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 1.2rem;
+  padding: 0.3rem 0.6rem;
+  margin: 0 0.25rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  user-select: none;
+}
+
+#mediaController button:hover {
+  background-color: #003300;
+}
+
+#mediaController {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+/* Music player */
+#musicPlayer audio {
+  width: 100%;
+  outline: none;
+  margin-top: 0.5rem;
+}
+
+/* Minimized container */
+#minimizedContainer {
+  position: fixed;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  z-index: 2000;
+  user-select: none;
+}
+
+.minimized-widget {
+  background: #0f0e0e;
+  border: 1px solid #00ff00;
+  border-radius: 6px 0 0 6px;
+  padding: 0.3rem 0.6rem;
+  color: #00ff00;
+  cursor: pointer;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 140px;
+  box-shadow: 0 0 4px #00ff00;
+  animation: pixelateIn 0.3s ease forwards;
+}
+
+.minimized-widget:hover {
+  background-color: #003300;
+}
+
+/* Pixelated animation */
+@keyframes pixelateIn {
+  0% {
+    filter: blur(4px) contrast(20) saturate(0);
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  100% {
+    filter: blur(0) contrast(1) saturate(1);
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Widget positions */
+#clockWidget {
+  top: 20px;
+  left: 20px;
+}
+
+#todoWidget {
+  top: 20px;
+  left: 360px;
+}
+
+#weatherWidget {
+  top: 20px;
+  left: 700px;
+}
+
+#screensaverWidget {
+  top: 250px;
+  left: 20px;
+  max-width: 400px;
+}
+
+#mediaController {
+  top: 250px;
+  left: 450px;
+}
+
+#musicPlayer {
+  top: 450px;
+  left: 20px;
+}
+
+/* Widget content specific styles */
+#clockWidget .widget-content {
+  overflow: visible;
+}
+
+#screensaverWidget .widget-content {
+  height: 150px;
+  padding: 0;
+}
+
+#mediaController .widget-content {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.draggable-widget {
+  transition: opacity 0.2s ease-in-out;
+  opacity: 1;
+}
+
+.draggable-widget.loading {
+  opacity: 0;
+  transition: none;
+}
+
+/* Settings Button */
+.settings-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: transparent;
+  border: 2px solid #00ff00;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #00ff00;
+  transition: all 0.3s ease;
+  z-index: 2000;
+}
+
+.settings-btn:hover {
+  background-color: #003300;
+  transform: rotate(45deg);
+}
+
+/* Settings Modal */
+.settings-modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  z-index: 3000;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.settings-modal.visible {
+  display: flex;
+  opacity: 1;
+}
+
+.settings-content {
+  background: #0f0e0e;
+  border: 2px solid #00ff00;
+  border-radius: 10px;
+  width: 90%;
+  max-width: 500px;
+  margin: auto;
+  padding: 20px;
+  position: relative;
+  transform: translateY(-20px);
+  transition: transform 0.3s ease;
+}
+
+.settings-modal.visible .settings-content {
+  transform: translateY(0);
+}
+
+.settings-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #00ff00;
+}
+
+.settings-header h2 {
+  margin: 0;
+  color: #00ff00;
+  font-size: 1.5rem;
+}
+
+.close-btn {
+  background: transparent;
+  border: none;
+  color: #00ff00;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 5px;
+  line-height: 1;
+  transition: color 0.3s ease;
+}
+
+.close-btn:hover {
+  color: #66ff66;
+}
+
+.setting-group {
+  margin-bottom: 20px;
+}
+
+.setting-group h3 {
+  color: #00ff00;
+  margin: 0 0 10px 0;
+  font-size: 1.1rem;
+}
+
+.settings-select,
+.settings-input {
+  width: 100%;
+  background: transparent;
+  border: 1px solid #00ff00;
+  color: #00ff00;
+  padding: 8px;
+  border-radius: 4px;
+  font-family: 'Share Tech Mono', monospace;
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+
+.settings-select:focus,
+.settings-input:focus {
+  outline: none;
+  border-color: #66ff66;
+}
+
+.settings-select option {
+  background: #0f0e0e;
+  color: #00ff00;
+  padding: 8px;
+}
+
+.settings-select optgroup {
+  background: #0f0e0e;
+  color: #66ff66;
+  font-weight: bold;
+}
+
+.weather-input-group {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.weather-input-group .settings-input {
+  margin-bottom: 0;
+  flex: 1;
+}
+
+#saveWeatherLocation {
+  background: transparent;
+  border: 1px solid #00ff00;
+  color: #00ff00;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: 'Share Tech Mono', monospace;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+#saveWeatherLocation:hover {
+  background-color: #003300;
+  transform: none;
+}
+
+/* Matrix Background */
+#matrixBackground {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+#matrixBackground.visible {
+  opacity: 0.15;
+} 

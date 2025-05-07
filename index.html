@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>New Tab</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet" />
+<link href="styles.css" rel="stylesheet" />
+</head>
+<body>
+  <canvas id="matrixBackground"></canvas>
+  <!-- Centered Search -->
+  <div id="searchContainer" role="search">
+    <h1>Hacker Search Terminal</h1>
+    <form id="searchForm" aria-label="Search form">
+      <input type="text" id="searchInput" placeholder="Type your search query here..." aria-label="Search input" autocomplete="off" />
+      <button type="submit" aria-label="Search">Search</button>
+    </form>
+    <div class="tags" role="list" aria-label="Search engine tags">
+      <div class="tag selected" data-engine="google" role="listitem" tabindex="0" aria-pressed="true">Google</div>
+      <div class="tag" data-engine="youtube" role="listitem" tabindex="0" aria-pressed="false">YouTube</div>
+      <div class="tag" data-engine="github" role="listitem" tabindex="0" aria-pressed="false">GitHub</div>
+      <div class="tag" data-engine="duckduckgo" role="listitem" tabindex="0" aria-pressed="false">DuckDuckGo</div>
+      <div class="tag" data-engine="bing" role="listitem" tabindex="0" aria-pressed="false">Bing</div>
+      <div class="tag" data-engine="scholar" role="listitem" tabindex="0" aria-pressed="false">Google Scholar</div>
+    </div>
+  </div>
+
+  <!-- Minimized widgets container -->
+  <div id="minimizedContainer" aria-label="Minimized widgets"></div>
+
+  <!-- Draggable Widgets -->
+  <div id="clockWidget" class="draggable flicker" role="region" aria-label="Clock widget" tabindex="0" aria-live="polite" aria-atomic="true">
+    <div class="drag-header select-none" tabindex="0" role="button" aria-label="Drag Hacker Clock widget">
+      Hacker Clock
+      <div>
+        <button class="toggle-btn" aria-pressed="false" aria-label="Toggle clock display mode">Analog</button>
+        <button class="minimize-btn" aria-label="Minimize clock widget">_</button>
+        <button class="resize-btn" aria-label="Resize clock widget">↔</button>
+      </div>
+    </div>
+    <div class="widget-content">
+      <div id="digitalClock" class="clock">00:00:00</div>
+      <div id="analogClock" class="analog-clock" aria-hidden="true">
+        <div class="hand hour" id="hourHand"></div>
+        <div class="hand minute" id="minuteHand"></div>
+        <div class="hand second" id="secondHand"></div>
+        <div class="center-dot"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="todoWidget" class="draggable flicker" role="region" aria-label="Todo list widget" tabindex="0">
+    <div class="drag-header select-none" tabindex="0" role="button" aria-label="Drag Hacker Todo List widget">
+      Hacker Todo List
+      <div>
+        <button class="minimize-btn" aria-label="Minimize todo widget">_</button>
+        <button class="resize-btn" aria-label="Resize todo widget">↔</button>
+      </div>
+    </div>
+    <div class="widget-content">
+      <div class="todo-list" id="todoList" aria-label="Todo list"></div>
+      <div class="todo-input-container">
+        <input id="todoInput" type="text" placeholder="Add new task" class="todo-input" aria-label="Add new task" />
+        <button id="addTodoBtn" class="todo-button" aria-label="Add task">Add</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="weatherWidget" class="draggable flicker" role="region" aria-label="Weather widget" tabindex="0">
+    <div class="drag-header select-none" tabindex="0" role="button" aria-label="Drag Weather widget">
+      Weather
+      <div>
+        <button class="minimize-btn" aria-label="Minimize weather widget">_</button>
+        <button class="resize-btn" aria-label="Resize weather widget">↔</button>
+      </div>
+    </div>
+    <div class="widget-content">
+      <div class="weather-info" id="weatherInfo">Loading weather...</div>
+    </div>
+  </div>
+
+  <div id="screensaverWidget" class="draggable flicker" role="region" aria-label="Screensaver widget" tabindex="0">
+    <div class="drag-header select-none" tabindex="0" role="button" aria-label="Drag Screensaver widget">
+      Screensaver
+      <div>
+        <button class="minimize-btn" aria-label="Minimize screensaver widget">_</button>
+        <button class="resize-btn" aria-label="Resize screensaver widget">↔</button>
+      </div>
+    </div>
+    <div class="widget-content">
+      <canvas id="screensaverCanvas" width="360" height="140"></canvas>
+    </div>
+  </div>
+
+  <div id="mediaController" class="draggable flicker" role="region" aria-label="Media controller widget" tabindex="0">
+    <div class="drag-header select-none" tabindex="0" role="button" aria-label="Drag Media Controller widget">
+      Media Controller
+      <div>
+        <button class="minimize-btn" aria-label="Minimize media controller widget">_</button>
+        <button class="resize-btn" aria-label="Resize media controller widget">↔</button>
+      </div>
+    </div>
+    <div class="widget-content">
+      <button id="playBtn" aria-label="Play" title="Play" class="toggle-btn">▶️</button>
+      <button id="pauseBtn" aria-label="Pause" title="Pause" class="toggle-btn">⏸️</button>
+      <button id="stopBtn" aria-label="Stop" title="Stop" class="toggle-btn">⏹️</button>
+    </div>
+  </div>
+
+  <div id="musicPlayer" class="draggable flicker" role="region" aria-label="Music player widget" tabindex="0">
+    <div class="drag-header select-none" tabindex="0" role="button" aria-label="Drag Music Player widget">
+      Music Player
+      <div>
+        <button class="minimize-btn" aria-label="Minimize music player widget">_</button>
+        <button class="resize-btn" aria-label="Resize music player widget">↔</button>
+      </div>
+    </div>
+    <div class="widget-content">
+      <audio id="audioPlayer" controls preload="none" aria-label="Music player audio controls">
+        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg" />
+        Your browser does not support the audio element.
+      </audio>
+    </div>
+  </div>
+
+  <button id="settingsBtn" class="settings-btn" aria-label="Open settings">
+    <svg viewBox="0 0 24 24" width="24" height="24">
+      <path fill="currentColor" d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.07,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/>
+    </svg>
+  </button>
+
+  <div id="settingsModal" class="settings-modal" role="dialog" aria-labelledby="settingsTitle" aria-hidden="true">
+    <div class="settings-content">
+      <div class="settings-header">
+        <h2 id="settingsTitle">Settings</h2>
+        <button class="close-btn" aria-label="Close settings">×</button>
+      </div>
+      <div class="settings-body">
+        <div class="setting-group">
+          <h3>Time Zone</h3>
+          <select id="timezoneSelect" class="settings-select">
+            <option value="local">Local Time</option>
+            <option value="UTC">UTC</option>
+            <optgroup label="North America">
+              <option value="America/New_York">New York (EST)</option>
+              <option value="America/Chicago">Chicago (CST)</option>
+              <option value="America/Denver">Denver (MST)</option>
+              <option value="America/Los_Angeles">Los Angeles (PST)</option>
+              <option value="America/Anchorage">Anchorage (AKST)</option>
+              <option value="America/Honolulu">Honolulu (HST)</option>
+            </optgroup>
+            <optgroup label="Europe">
+              <option value="Europe/London">London (GMT)</option>
+              <option value="Europe/Paris">Paris (CET)</option>
+              <option value="Europe/Berlin">Berlin (CET)</option>
+              <option value="Europe/Moscow">Moscow (MSK)</option>
+            </optgroup>
+            <optgroup label="Asia">
+              <option value="Asia/Tokyo">Tokyo (JST)</option>
+              <option value="Asia/Shanghai">Shanghai (CST)</option>
+              <option value="Asia/Singapore">Singapore (SGT)</option>
+              <option value="Asia/Dubai">Dubai (GST)</option>
+              <option value="Asia/Kolkata">Kolkata (IST)</option>
+            </optgroup>
+            <optgroup label="Oceania">
+              <option value="Australia/Sydney">Sydney (AEST)</option>
+              <option value="Australia/Perth">Perth (AWST)</option>
+              <option value="Pacific/Auckland">Auckland (NZST)</option>
+            </optgroup>
+            <optgroup label="South America">
+              <option value="America/Sao_Paulo">São Paulo (BRT)</option>
+              <option value="America/Argentina/Buenos_Aires">Buenos Aires (ART)</option>
+            </optgroup>
+            <optgroup label="Africa">
+              <option value="Africa/Cairo">Cairo (EET)</option>
+              <option value="Africa/Johannesburg">Johannesburg (SAST)</option>
+              <option value="Africa/Lagos">Lagos (WAT)</option>
+            </optgroup>
+          </select>
+        </div>
+        <div class="setting-group">
+          <h3>Weather Location</h3>
+          <div class="weather-input-group">
+            <input type="text" id="weatherLocation" class="settings-input" placeholder="Enter city name">
+            <button id="saveWeatherLocation" class="settings-btn">Save</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

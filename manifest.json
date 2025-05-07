@@ -1,0 +1,17 @@
+{
+  "manifest_version": 3,
+  "name": "Hacker Search",
+  "version": "1.0",
+  "description": "A hacker-themed new tab page with search functionality",
+  "permissions": [
+    "storage",
+    "tabs",
+    "activeTab"
+  ],
+  "chrome_url_overrides": {
+    "newtab": "index.html"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  }
+} 
