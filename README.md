@@ -10,11 +10,30 @@ A modern, customizable search page with a matrix-inspired theme and powerful wid
 3. Confirm the installation
 
 ### Manual Installation
-1. Download or clone this repository
-2. Open Chrome and go to `chrome://extensions/`
-3. Enable "Developer mode" in the top right
-4. Click "Load unpacked"
-5. Select the downloaded folder
+
+#### Option 1: Clone the Repository
+```bash
+# Clone the repository
+git clone https://github.com/hawatri/Hacker-Search.git
+
+# Navigate to the project directory
+cd Hacker-Search
+
+# Install the extension in Chrome
+1. Open Chrome and go to chrome://extensions/
+2. Enable "Developer mode" in the top right
+3. Click "Load unpacked"
+4. Select the Hacker-Search folder
+```
+
+#### Option 2: Download ZIP
+1. Click the green "Code" button on this repository
+2. Select "Download ZIP"
+3. Extract the downloaded ZIP file
+4. Open Chrome and go to `chrome://extensions/`
+5. Enable "Developer mode" in the top right
+6. Click "Load unpacked"
+7. Select the extracted folder
 
 ## Screenshots
 
