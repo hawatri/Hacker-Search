@@ -1873,9 +1873,13 @@ async function showSuggestions(query) {
     suggestions.forEach(suggestion => {
       const div = document.createElement('div');
       div.className = 'suggestion-item';
+      
+      // Truncate URL for display
+      const displayUrl = truncateUrl(suggestion.url);
+      
       div.innerHTML = `
         <div class="suggestion-title">${suggestion.title}</div>
-        <div class="suggestion-url">${suggestion.url}</div>
+        <div class="suggestion-url" title="${suggestion.url}">${displayUrl}</div>
       `;
       div.addEventListener('click', () => {
         window.location.href = suggestion.url;
@@ -1885,6 +1889,24 @@ async function showSuggestions(query) {
     searchSuggestions.style.display = 'block';
   } else {
     searchSuggestions.style.display = 'none';
+  }
+}
+
+// Function to truncate URL
+function truncateUrl(url) {
+  try {
+    const urlObj = new URL(url);
+    let displayUrl = urlObj.hostname;
+    if (urlObj.pathname !== '/') {
+      displayUrl += urlObj.pathname;
+    }
+    if (displayUrl.length > 50) {
+      return displayUrl.substring(0, 47) + '...';
+    }
+    return displayUrl;
+  } catch (e) {
+    // If URL parsing fails, truncate the original string
+    return url.length > 50 ? url.substring(0, 47) + '...' : url;
   }
 }
 

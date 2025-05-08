@@ -1818,13 +1818,24 @@ button[type="submit"]:hover {
   padding: 10px;
   cursor: pointer;
   border-bottom: 1px solid var(--border-color);
-  transition: background-color 0.2s;
+  transition: all 0.2s ease;
   word-wrap: break-word;
   overflow-wrap: break-word;
+  position: relative;
 }
 
 .suggestion-item:hover {
-  background-color: var(--background-light);
+  background-color: var(--primary-hover);
+  transform: translateX(5px);
+  box-shadow: -2px 0 0 var(--primary-color);
+}
+
+.suggestion-item:hover .suggestion-title {
+  color: var(--primary-light);
+}
+
+.suggestion-item:hover .suggestion-url {
+  opacity: 1;
 }
 
 .suggestion-title {
@@ -1833,6 +1844,7 @@ button[type="submit"]:hover {
   margin-bottom: 4px;
   white-space: normal;
   word-break: break-word;
+  transition: color 0.2s ease;
 }
 
 .suggestion-url {
@@ -1841,6 +1853,7 @@ button[type="submit"]:hover {
   opacity: 0.8;
   white-space: normal;
   word-break: break-all;
+  transition: opacity 0.2s ease;
 }
 
 /* Update search container for suggestions */
