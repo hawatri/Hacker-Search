@@ -2,6 +2,22 @@
 
 A modern, customizable search page with a matrix-inspired theme and powerful widgets. Built as a Chrome extension for a personalized new tab experience.
 
+## Screenshots
+
+<div align="center">
+  <img src="images/image (1).png" alt="Hacker Search Main Interface" width="45%"/>
+  <img src="images/image (2).png" alt="Widgets and Customization" width="45%"/>
+  <br/>
+  <img src="images/image (3).png" alt="Search Features" width="45%"/>
+  <img src="images/image (4).png" alt="AI Tools Integration" width="45%"/>
+  <br/>
+  <img src="images/image (5).png" alt="Theme Customization" width="45%"/>
+  <img src="images/image (6).png" alt="Widget Management" width="45%"/>
+  <br/>
+  <img src="images/image (7).png" alt="Advanced Features" width="45%"/>
+  <img src="images/image (8).png" alt="Settings and Configuration" width="45%"/>
+</div>
+
 ## Overview
 
 Hacker Search transforms your new tab page into a powerful, customizable dashboard with search capabilities, widgets, and AI tools. The interface features a dynamic matrix background with theme support and a collection of draggable, resizable widgets.
