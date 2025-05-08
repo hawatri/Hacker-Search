@@ -67,6 +67,16 @@ function parseInput(input) {
     };
   }
   
+  // Handle direct search engine access
+  if (searchEngines[first] && parts.length === 1) {
+    return {
+      engine: first,
+      query: '',
+      newTab: false,
+      directAccess: true
+    };
+  }
+  
   // Handle regular search engine commands
   if (searchEngines[first]) {
     return {
@@ -87,7 +97,22 @@ searchForm.addEventListener('submit', e => {
   e.preventDefault();
   const input = searchInput.value.trim();
   if (!input) return;
-  const { engine, query, newTab } = parseInput(input);
+  const { engine, query, newTab, directAccess } = parseInput(input);
+  
+  if (directAccess) {
+    // Direct access to search engine
+    const baseUrls = {
+      google: 'https://www.google.com',
+      youtube: 'https://www.youtube.com',
+      github: 'https://github.com',
+      duckduckgo: 'https://duckduckgo.com',
+      bing: 'https://www.bing.com',
+      scholar: 'https://scholar.google.com'
+    };
+    window.location.href = baseUrls[engine];
+    return;
+  }
+  
   if (!query) return;
   const url = searchEngines[engine](query);
   
