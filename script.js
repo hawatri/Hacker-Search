@@ -684,6 +684,10 @@ function saveSettings() {
     applyTheme(settings.theme);
     toggleHeaders(settings.showHeaders);
     toggleAITools(settings.showAITools);
+    
+    // Close the settings modal
+    settingsModal.classList.remove('visible');
+    settingsModal.setAttribute('aria-hidden', 'true');
   });
 }
 
