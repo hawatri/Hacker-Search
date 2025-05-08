@@ -118,16 +118,23 @@ function makeDraggable(dragElement, dragHandle) {
   dragHandle.addEventListener('mousedown', (e) => {
     if (dragElement.dataset.locked === 'true') return;
     isDragging = true;
+    
+    // Calculate the offset from the mouse position to the element's top-left corner
     const rect = dragElement.getBoundingClientRect();
     offsetX = e.clientX - rect.left;
     offsetY = e.clientY - rect.top;
+    
     document.body.style.userSelect = 'none';
+    dragElement.style.transition = 'none';
+    dragElement.style.cursor = 'grabbing';
   });
 
   window.addEventListener('mouseup', () => {
     if (isDragging) {
       isDragging = false;
       document.body.style.userSelect = '';
+      dragElement.style.cursor = '';
+      dragElement.style.transition = 'all 0.3s ease';
       // Save position when dragging ends
       saveWidgetPosition(dragElement);
     }
@@ -135,16 +142,20 @@ function makeDraggable(dragElement, dragHandle) {
 
   window.addEventListener('mousemove', (e) => {
     if (!isDragging) return;
+    
+    // Calculate new position based on mouse position and initial offset
     let left = e.clientX - offsetX;
     let top = e.clientY - offsetY;
+
+    // Constrain to window bounds
     const maxLeft = window.innerWidth - dragElement.offsetWidth;
     const maxTop = window.innerHeight - dragElement.offsetHeight;
-    if (left < 0) left = 0;
-    if (top < 0) top = 0;
-    if (left > maxLeft) left = maxLeft;
-    if (top > maxTop) top = maxTop;
-    dragElement.style.left = left + 'px';
-    dragElement.style.top = top + 'px';
+    left = Math.max(0, Math.min(left, maxLeft));
+    top = Math.max(0, Math.min(top, maxTop));
+
+    // Apply the new position
+    dragElement.style.left = `${left}px`;
+    dragElement.style.top = `${top}px`;
   });
 
   // Keyboard accessibility: move with arrow keys when focused on header
@@ -230,7 +241,8 @@ const widgets = [
   'mediaPlayer',
   'readmeWidget',
   'notesWidget',
-  'calendarWidget'
+  'calendarWidget',
+  'clipboardWidget'
 ];
 
 // Minimize and resize logic
@@ -464,6 +476,7 @@ window.addEventListener('load', () => {
   restoreSelectedEngine();
   restoreClockState();
   loadSettings();
+  initializeClipboardWidget();
   setInterval(updateClocks, 1000);
   updateClocks();
   
@@ -632,7 +645,8 @@ function saveSettings() {
     timezone: timezoneSelect.value,
     weatherLocation: weatherLocation.value.trim(),
     theme: document.getElementById('themeSelect').value,
-    showHeaders: document.getElementById('showHeaders').checked
+    showHeaders: document.getElementById('showHeaders').checked,
+    showAITools: document.getElementById('showAITools').checked
   };
   
   chrome.storage.local.set({ settings }, () => {
@@ -641,6 +655,7 @@ function saveSettings() {
     fetchWeather(settings.weatherLocation);
     applyTheme(settings.theme);
     toggleHeaders(settings.showHeaders);
+    toggleAITools(settings.showAITools);
   });
 }
 
@@ -651,18 +666,21 @@ function loadSettings() {
       timezone: 'Asia/Kolkata',
       weatherLocation: 'Kolkata',
       theme: 'matrix',
-      showHeaders: true
+      showHeaders: true,
+      showAITools: true
     };
     
     timezoneSelect.value = settings.timezone;
     weatherLocation.value = settings.weatherLocation;
     document.getElementById('themeSelect').value = settings.theme;
     document.getElementById('showHeaders').checked = settings.showHeaders;
+    document.getElementById('showAITools').checked = settings.showAITools;
     
     updateClockTimezone(settings.timezone);
     fetchWeather(settings.weatherLocation);
     applyTheme(settings.theme);
     toggleHeaders(settings.showHeaders);
+    toggleAITools(settings.showAITools);
   });
 }
 
@@ -744,6 +762,11 @@ document.getElementById('themeSelect').addEventListener('change', () => {
 
 // Add event listener for show headers checkbox
 document.getElementById('showHeaders').addEventListener('change', () => {
+  saveSettings();
+});
+
+// Add event listener for show AITools checkbox
+document.getElementById('showAITools').addEventListener('change', () => {
   saveSettings();
 });
 
@@ -1622,4 +1645,172 @@ notesInput.addEventListener('keydown', e => {
 });
 
 // Initialize notes
-renderNotes(); 
+renderNotes();
+
+// AI Tools functionality
+function initializeAITools() {
+  const aiTools = document.querySelectorAll('.ai-tool');
+  
+  aiTools.forEach(tool => {
+    tool.addEventListener('click', () => {
+      const toolName = tool.dataset.tool;
+      const toolUrl = getToolUrl(toolName);
+      if (toolUrl) {
+        window.open(toolUrl, '_blank');
+      }
+    });
+  });
+}
+
+function getToolUrl(toolName) {
+  const urls = {
+    chatgpt: 'https://chat.openai.com',
+    grok: 'https://grok.x.ai',
+    blackbox: 'https://www.blackbox.ai',
+    perplexity: 'https://www.perplexity.ai',
+    gemini: 'https://gemini.google.com',
+    copilot: 'https://copilot.microsoft.com',
+    claude: 'https://claude.ai',
+    metaai: 'https://ai.meta.com'
+  };
+  return urls[toolName];
+}
+
+// Initialize AI tools when the document is loaded
+document.addEventListener('DOMContentLoaded', () => {
+  initializeAITools();
+});
+
+// Function to toggle AI tools visibility
+function toggleAITools(show) {
+  const aiToolsContainer = document.getElementById('aiToolsContainer');
+  if (show) {
+    aiToolsContainer.style.display = 'flex';
+  } else {
+    aiToolsContainer.style.display = 'none';
+  }
+}
+
+// Clipboard Widget Logic
+const clipboardList = document.querySelector('.clipboard-list');
+const clearClipboardBtn = document.getElementById('clearClipboard');
+
+// Save clipboard items to storage
+function saveClipboardItems(items) {
+  chrome.storage.local.set({ clipboardItems: items });
+}
+
+// Load clipboard items from storage
+function loadClipboardItems() {
+  return new Promise((resolve) => {
+    chrome.storage.local.get(['clipboardItems'], (result) => {
+      resolve(result.clipboardItems || []);
+    });
+  });
+}
+
+// Format timestamp
+function formatTimestamp(timestamp) {
+  const date = new Date(timestamp);
+  return date.toLocaleString();
+}
+
+// Create clipboard item element
+function createClipboardItem(content, timestamp) {
+  const item = document.createElement('div');
+  item.className = 'clipboard-item';
+  
+  const contentDiv = document.createElement('div');
+  contentDiv.className = 'clipboard-content';
+  contentDiv.textContent = content;
+  
+  const timestampDiv = document.createElement('div');
+  timestampDiv.className = 'clipboard-timestamp';
+  timestampDiv.textContent = formatTimestamp(timestamp);
+  
+  const controlsDiv = document.createElement('div');
+  controlsDiv.className = 'clipboard-controls';
+  
+  const copyBtn = document.createElement('button');
+  copyBtn.className = 'clipboard-button';
+  copyBtn.textContent = 'Copy';
+  copyBtn.addEventListener('click', () => {
+    navigator.clipboard.writeText(content);
+  });
+  
+  const deleteBtn = document.createElement('button');
+  deleteBtn.className = 'clipboard-button delete';
+  deleteBtn.textContent = 'Delete';
+  deleteBtn.addEventListener('click', async () => {
+    const items = await loadClipboardItems();
+    const updatedItems = items.filter(item => item.timestamp !== timestamp);
+    saveClipboardItems(updatedItems);
+    renderClipboardItems(updatedItems);
+  });
+  
+  controlsDiv.appendChild(copyBtn);
+  controlsDiv.appendChild(deleteBtn);
+  
+  item.appendChild(contentDiv);
+  item.appendChild(timestampDiv);
+  item.appendChild(controlsDiv);
+  
+  return item;
+}
+
+// Render clipboard items
+function renderClipboardItems(items) {
+  clipboardList.innerHTML = '';
+  items.forEach(item => {
+    const itemElement = createClipboardItem(item.content, item.timestamp);
+    clipboardList.appendChild(itemElement);
+  });
+}
+
+// Add new clipboard item
+async function addClipboardItem(content) {
+  if (!content.trim()) return;
+  
+  const items = await loadClipboardItems();
+  const newItem = {
+    content,
+    timestamp: Date.now()
+  };
+  
+  // Add new item at the beginning
+  items.unshift(newItem);
+  
+  // Keep only the last 50 items
+  if (items.length > 50) {
+    items.pop();
+  }
+  
+  saveClipboardItems(items);
+  renderClipboardItems(items);
+}
+
+// Clear all clipboard items
+clearClipboardBtn.addEventListener('click', async () => {
+  saveClipboardItems([]);
+  renderClipboardItems([]);
+});
+
+// Listen for clipboard changes
+document.addEventListener('copy', async (e) => {
+  const selectedText = window.getSelection().toString();
+  if (selectedText) {
+    await addClipboardItem(selectedText);
+  }
+});
+
+// Initialize clipboard widget
+async function initializeClipboardWidget() {
+  const items = await loadClipboardItems();
+  renderClipboardItems(items);
+}
+
+// Add clipboard widget initialization to the main initialization
+document.addEventListener('DOMContentLoaded', async () => {
+  await initializeWidgets();
+  await initializeClipboardWidget();
+}); 

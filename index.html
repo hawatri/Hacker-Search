@@ -374,7 +374,56 @@
             <label for="showHeaders">Show Widget Headers</label>
             <input type="checkbox" id="showHeaders" checked>
           </div>
+          <div class="setting-item">
+            <label for="showAITools">Show AI Tools</label>
+            <input type="checkbox" id="showAITools" checked>
+          </div>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="aiToolsContainer" class="ai-tools-container">
+    <div class="ai-tool minimized" data-tool="chatgpt">
+      <span class="ai-tool-name">ChatGPT</span>
+    </div>
+    <div class="ai-tool minimized" data-tool="grok">
+      <span class="ai-tool-name">Grok</span>
+    </div>
+    <div class="ai-tool minimized" data-tool="blackbox">
+      <span class="ai-tool-name">Blackbox</span>
+    </div>
+    <div class="ai-tool minimized" data-tool="perplexity">
+      <span class="ai-tool-name">Perplexity</span>
+    </div>
+    <div class="ai-tool minimized" data-tool="gemini">
+      <span class="ai-tool-name">Gemini</span>
+    </div>
+    <div class="ai-tool minimized" data-tool="copilot">
+      <span class="ai-tool-name">Copilot</span>
+    </div>
+    <div class="ai-tool minimized" data-tool="claude">
+      <span class="ai-tool-name">Claude</span>
+    </div>
+    <div class="ai-tool minimized" data-tool="metaai">
+      <span class="ai-tool-name">Meta AI</span>
+    </div>
+  </div>
+
+  <!-- Clipboard Widget -->
+  <div id="clipboardWidget" class="draggable">
+    <div class="drag-header">
+      <span>Clipboard History</span>
+      <div class="header-controls">
+        <button class="lock-btn" aria-label="Lock widget">[X]</button>
+        <button class="minimize-btn" aria-label="Minimize widget">_</button>
+        <button class="resize-btn" title="Size: Normal" aria-label="Resize widget">N</button>
+      </div>
+    </div>
+    <div class="widget-content">
+      <div class="clipboard-list"></div>
+      <div class="clipboard-controls">
+        <button id="clearClipboard" class="clipboard-button">Clear All</button>
       </div>
     </div>
   </div>
