@@ -34,6 +34,7 @@
     <div class="drag-header select-none" tabindex="0" role="button" aria-label="Drag Hacker Clock widget">
       Hacker Clock
       <div>
+        <button class="lock-btn" aria-label="Lock widget position">[X]</button>
         <button class="toggle-btn" aria-pressed="false" aria-label="Toggle clock display mode">Analog</button>
         <button class="minimize-btn" aria-label="Minimize clock widget">_</button>
         <button class="resize-btn" aria-label="Resize clock widget">↔</button>
@@ -54,16 +55,17 @@
     <div class="drag-header select-none" tabindex="0" role="button" aria-label="Drag Hacker Todo List widget">
       Hacker Todo List
       <div>
+        <button class="lock-btn" aria-label="Lock widget position">[X]</button>
         <button class="minimize-btn" aria-label="Minimize todo widget">_</button>
         <button class="resize-btn" aria-label="Resize todo widget">↔</button>
       </div>
     </div>
     <div class="widget-content">
-      <div class="todo-list" id="todoList" aria-label="Todo list"></div>
       <div class="todo-input-container">
         <input id="todoInput" type="text" placeholder="Add new task" class="todo-input" aria-label="Add new task" />
         <button id="addTodoBtn" class="todo-button" aria-label="Add task">Add</button>
       </div>
+      <div class="todo-list" id="todoList" aria-label="Todo list"></div>
     </div>
   </div>
 
@@ -71,6 +73,7 @@
     <div class="drag-header select-none" tabindex="0" role="button" aria-label="Drag Weather widget">
       Weather
       <div>
+        <button class="lock-btn" aria-label="Lock widget position">[X]</button>
         <button class="minimize-btn" aria-label="Minimize weather widget">_</button>
         <button class="resize-btn" aria-label="Resize weather widget">↔</button>
       </div>
@@ -84,6 +87,7 @@
     <div class="drag-header select-none" tabindex="0" role="button" aria-label="Drag Screensaver widget">
       Screensaver
       <div>
+        <button class="lock-btn" aria-label="Lock widget position">[X]</button>
         <button class="minimize-btn" aria-label="Minimize screensaver widget">_</button>
         <button class="resize-btn" aria-label="Resize screensaver widget">↔</button>
       </div>
@@ -97,6 +101,7 @@
     <div class="drag-header select-none" tabindex="0" role="button" aria-label="Drag Media Player widget">
       Media Player
       <div>
+        <button class="lock-btn" aria-label="Lock widget position">[X]</button>
         <button class="minimize-btn" aria-label="Minimize media player widget">_</button>
         <button class="resize-btn" aria-label="Resize media player widget">↔</button>
       </div>
@@ -153,6 +158,7 @@
     <div class="drag-header select-none" tabindex="0" role="button" aria-label="Drag README widget">
       README
       <div>
+        <button class="lock-btn" aria-label="Lock widget position">[X]</button>
         <button class="minimize-btn" aria-label="Minimize README widget">_</button>
         <button class="resize-btn" aria-label="Resize README widget">↔</button>
       </div>
@@ -231,6 +237,65 @@
     </div>
   </div>
 
+  <div id="notesWidget" class="draggable flicker" role="region" aria-label="Notes widget" tabindex="0">
+    <div class="drag-header select-none" tabindex="0" role="button" aria-label="Drag Notes widget">
+      Quick Notes
+      <div>
+        <button class="lock-btn" aria-label="Lock widget position">[X]</button>
+        <button class="minimize-btn" aria-label="Minimize notes widget">_</button>
+        <button class="resize-btn" aria-label="Resize notes widget">↔</button>
+      </div>
+    </div>
+    <div class="widget-content">
+      <div class="notes-list" id="notesList" aria-label="Notes list"></div>
+      <div class="notes-input-container">
+        <textarea id="notesInput" class="notes-input" placeholder="Type your note here..." aria-label="Add new note"></textarea>
+        <button id="addNoteBtn" class="notes-button" aria-label="Add note">Add</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="calendarWidget" class="draggable flicker" role="region" aria-label="Calendar widget" tabindex="0">
+    <div class="drag-header select-none" tabindex="0" role="button" aria-label="Drag Calendar widget">
+      Calendar
+      <div>
+        <button class="lock-btn" aria-label="Lock widget position">[X]</button>
+        <button class="minimize-btn" aria-label="Minimize calendar widget">_</button>
+        <button class="resize-btn" aria-label="Resize calendar widget">↔</button>
+      </div>
+    </div>
+    <div class="widget-content">
+      <div class="calendar-header">
+        <button class="calendar-nav-btn calendar-prev" aria-label="Previous month">←</button>
+        <h3 class="calendar-title"></h3>
+        <button class="calendar-nav-btn calendar-next" aria-label="Next month">→</button>
+      </div>
+      <div class="calendar-content">
+        <div class="calendar-weekdays">
+          <div>Sun</div>
+          <div>Mon</div>
+          <div>Tue</div>
+          <div>Wed</div>
+          <div>Thu</div>
+          <div>Fri</div>
+          <div>Sat</div>
+        </div>
+        <div class="calendar-days"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="calendar-note-modal">
+    <div class="calendar-note-content">
+      <h4></h4>
+      <textarea class="calendar-note-input" placeholder="Add a note for this date..."></textarea>
+      <div class="calendar-note-buttons">
+        <button class="calendar-note-btn calendar-note-save">Save</button>
+        <button class="calendar-note-btn calendar-note-close">Close</button>
+      </div>
+    </div>
+  </div>
+
   <button id="settingsBtn" class="settings-btn" aria-label="Open settings">
     <svg viewBox="0 0 24 24" width="24" height="24">
       <path fill="currentColor" d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.07,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/>
@@ -303,10 +368,18 @@
             <button id="saveWeatherLocation" class="settings-btn">Save</button>
           </div>
         </div>
+        <div class="setting-group">
+          <h4>Widget Settings</h4>
+          <div class="setting-item">
+            <label for="showHeaders">Show Widget Headers</label>
+            <input type="checkbox" id="showHeaders" checked>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 
   <script src="script.js"></script>
+  <script src="calendar.js"></script>
 </body>
 </html>

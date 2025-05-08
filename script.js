@@ -116,6 +116,7 @@ function makeDraggable(dragElement, dragHandle) {
   });
 
   dragHandle.addEventListener('mousedown', (e) => {
+    if (dragElement.dataset.locked === 'true') return;
     isDragging = true;
     const rect = dragElement.getBoundingClientRect();
     offsetX = e.clientX - rect.left;
@@ -227,7 +228,9 @@ const widgets = [
   'weatherWidget',
   'screensaverWidget',
   'mediaPlayer',
-  'readmeWidget'
+  'readmeWidget',
+  'notesWidget',
+  'calendarWidget'
 ];
 
 // Minimize and resize logic
@@ -301,6 +304,56 @@ widgets.forEach(id => {
   const resizeBtn = widget.querySelector('.resize-btn');
   minimizeBtn.addEventListener('click', () => minimizeWidget(widget));
   resizeBtn.addEventListener('click', () => resizeWidget(widget));
+});
+
+// Function to save widget lock state
+function saveWidgetLockState(widgetId, isLocked) {
+  chrome.storage.local.get(['widgetLocks'], (result) => {
+    const locks = result.widgetLocks || {};
+    locks[widgetId] = isLocked;
+    chrome.storage.local.set({ widgetLocks: locks });
+  });
+}
+
+// Function to restore widget lock states
+function restoreWidgetLockStates() {
+  chrome.storage.local.get(['widgetLocks'], (result) => {
+    const locks = result.widgetLocks || {};
+    widgets.forEach(id => {
+      const widget = document.getElementById(id);
+      const lockBtn = widget.querySelector('.lock-btn');
+      if (locks[id]) {
+        lockBtn.classList.add('locked');
+        lockBtn.textContent = '[ ]';
+        widget.dataset.locked = 'true';
+      }
+    });
+  });
+}
+
+// Function to toggle header visibility
+function toggleHeaders(show) {
+  widgets.forEach(id => {
+    const widget = document.getElementById(id);
+    const header = widget.querySelector('.drag-header');
+    if (show) {
+      header.classList.remove('hidden');
+    } else {
+      header.classList.add('hidden');
+    }
+  });
+}
+
+// Add lock button handlers
+widgets.forEach(id => {
+  const widget = document.getElementById(id);
+  const lockBtn = widget.querySelector('.lock-btn');
+  lockBtn.addEventListener('click', () => {
+    const isLocked = lockBtn.classList.toggle('locked');
+    lockBtn.textContent = isLocked ? '[ ]' : '[X]';
+    widget.dataset.locked = isLocked;
+    saveWidgetLockState(id, isLocked);
+  });
 });
 
 // Initialize widgets and restore positions
@@ -392,6 +445,9 @@ async function initializeWidgets() {
     widget.style.visibility = 'visible';
     widget.style.opacity = '1';
   });
+
+  // Restore lock states
+  restoreWidgetLockStates();
 }
 
 // Focus management
@@ -575,7 +631,8 @@ function saveSettings() {
   const settings = {
     timezone: timezoneSelect.value,
     weatherLocation: weatherLocation.value.trim(),
-    theme: document.getElementById('themeSelect').value
+    theme: document.getElementById('themeSelect').value,
+    showHeaders: document.getElementById('showHeaders').checked
   };
   
   chrome.storage.local.set({ settings }, () => {
@@ -583,6 +640,7 @@ function saveSettings() {
     updateClockTimezone(settings.timezone);
     fetchWeather(settings.weatherLocation);
     applyTheme(settings.theme);
+    toggleHeaders(settings.showHeaders);
   });
 }
 
@@ -592,16 +650,19 @@ function loadSettings() {
     const settings = data.settings || {
       timezone: 'Asia/Kolkata',
       weatherLocation: 'Kolkata',
-      theme: 'matrix'
+      theme: 'matrix',
+      showHeaders: true
     };
     
     timezoneSelect.value = settings.timezone;
     weatherLocation.value = settings.weatherLocation;
     document.getElementById('themeSelect').value = settings.theme;
+    document.getElementById('showHeaders').checked = settings.showHeaders;
     
     updateClockTimezone(settings.timezone);
     fetchWeather(settings.weatherLocation);
     applyTheme(settings.theme);
+    toggleHeaders(settings.showHeaders);
   });
 }
 
@@ -678,6 +739,11 @@ saveWeatherLocation.addEventListener('click', () => {
 
 // Add event listener for theme select
 document.getElementById('themeSelect').addEventListener('change', () => {
+  saveSettings();
+});
+
+// Add event listener for show headers checkbox
+document.getElementById('showHeaders').addEventListener('change', () => {
   saveSettings();
 });
 
@@ -1463,93 +1529,97 @@ folderInput.addEventListener('change', async (e) => {
   }
 });
 
-// Update initializeWidgets to handle playlist restoration
-async function initializeWidgets() {
-  // Hide all widgets initially and add loading state
-  widgets.forEach(id => {
-    const widget = document.getElementById(id);
-    widget.style.visibility = 'hidden';
-    widget.style.opacity = '0';
-    widget.classList.add('loading');
-  });
+// Notes Widget Logic
+const notesListEl = document.getElementById('notesList');
+const notesInput = document.getElementById('notesInput');
+const addNoteBtn = document.getElementById('addNoteBtn');
 
-  // Wait for all widget states to be restored
-  await new Promise(resolve => {
-    chrome.storage.local.get(['widgetPositions', 'widgetStates', 'widgetSizes'], (result) => {
-      const positions = result.widgetPositions || {};
-      const states = result.widgetStates || {};
-      const sizes = result.widgetSizes || {};
-      
-      widgets.forEach(id => {
-        const widget = document.getElementById(id);
-        // Restore position
-        if (positions[id]) {
-          widget.style.left = positions[id].left;
-          widget.style.top = positions[id].top;
-        }
-        
-        // Set default size if no size is saved
-        if (!sizes[id]) {
-          const sizePresets = {
-            mediaPlayer: [
-              { w: 320, h: 400 },   // Small
-              { w: 400, h: 500 },   // Normal
-              { w: 480, h: 600 },   // Medium
-              { w: 560, h: 700 },   // Large
-              { w: 640, h: 800 }    // Huge
-            ],
-            default: [
-              { w: 240, h: 180 },   // Small
-              { w: 320, h: 240 },   // Normal
-              { w: 400, h: 320 },   // Medium
-              { w: 480, h: 400 },   // Large
-              { w: 560, h: 480 }    // Huge
-            ]
-          };
-          
-          const presetSizes = sizePresets[id] || sizePresets.default;
-          const defaultSize = presetSizes[1]; // Normal size is at index 1
-          
-          widget.style.width = `${defaultSize.w}px`;
-          widget.style.height = `${defaultSize.h}px`;
-          
-          // Update resize button to show Normal size
-          const resizeBtn = widget.querySelector('.resize-btn');
-          resizeBtn.textContent = 'N';
-          resizeBtn.setAttribute('title', 'Size: Normal');
-          
-          // Save the default size
-          saveWidgetSize(id, defaultSize);
-        } else {
-          // Restore saved size
-          widget.style.width = `${sizes[id].w}px`;
-          widget.style.height = `${sizes[id].h}px`;
-        }
-        
-        // Restore minimized state
-        if (states[id] && states[id].minimized) {
-          minimizeWidget(widget);
-        }
+function saveNotes(notes) {
+  chrome.storage.local.set({ 'hackerNotes': notes });
+}
 
-        // Make widget draggable
-        const header = widget.querySelector('.drag-header');
-        makeDraggable(widget, header);
-      });
-      resolve();
+function loadNotes() {
+  return new Promise((resolve) => {
+    chrome.storage.local.get('hackerNotes', (result) => {
+      resolve(result.hackerNotes || []);
     });
   });
+}
 
-  // Restore playlist data
-  await restorePlaylistData();
-
-  // Small delay to ensure smooth transition
-  await new Promise(resolve => setTimeout(resolve, 50));
-
-  // Show widgets with fade-in effect
-  widgets.forEach(id => {
-    const widget = document.getElementById(id);
-    widget.classList.remove('loading');
-    widget.style.visibility = 'visible';
-    widget.style.opacity = '1';
+function formatTimestamp(timestamp) {
+  const date = new Date(timestamp);
+  return date.toLocaleString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
   });
-} 
+}
+
+async function renderNotes() {
+  const notes = await loadNotes();
+  notesListEl.innerHTML = '';
+  notes.forEach((note, idx) => {
+    const div = document.createElement('div');
+    div.className = 'note-item';
+    
+    const timestamp = document.createElement('div');
+    timestamp.className = 'note-timestamp';
+    timestamp.textContent = formatTimestamp(note.timestamp);
+    
+    const content = document.createElement('div');
+    content.className = 'note-content';
+    content.textContent = note.content;
+    
+    const controls = document.createElement('div');
+    controls.className = 'note-controls';
+    
+    const deleteBtn = document.createElement('button');
+    deleteBtn.className = 'delete-btn';
+    deleteBtn.setAttribute('role', 'button');
+    deleteBtn.setAttribute('tabindex', '0');
+    deleteBtn.setAttribute('aria-label', 'Delete note');
+    deleteBtn.textContent = 'DELETE';
+    deleteBtn.onclick = async () => {
+      const currentNotes = await loadNotes();
+      currentNotes.splice(idx, 1);
+      await saveNotes(currentNotes);
+      renderNotes();
+    };
+    deleteBtn.onkeydown = (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        deleteBtn.click();
+      }
+    };
+    
+    controls.appendChild(deleteBtn);
+    div.appendChild(timestamp);
+    div.appendChild(content);
+    div.appendChild(controls);
+    notesListEl.appendChild(div);
+  });
+}
+
+addNoteBtn.addEventListener('click', async () => {
+  const content = notesInput.value.trim();
+  if (!content) return;
+  const notes = await loadNotes();
+  notes.unshift({
+    content,
+    timestamp: Date.now()
+  });
+  await saveNotes(notes);
+  notesInput.value = '';
+  renderNotes();
+});
+
+notesInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    addNoteBtn.click();
+  }
+});
+
+// Initialize notes
+renderNotes(); 
