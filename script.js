@@ -61,7 +61,7 @@ function parseInput(input) {
   const first = parts[0].toLowerCase();
   const second = parts[1]?.toLowerCase();
   
-  // Handle NT command
+  // Handle NT command first
   if (first === 'nt' && second && searchEngines[second]) {
     return {
       engine: second,
@@ -89,6 +89,23 @@ function parseInput(input) {
     };
   }
   
+  // Check if input is a URL or domain name (only if it's a single word)
+  if (parts.length === 1) {
+    try {
+      // First try with https:// prefix
+      const url = new URL(input.startsWith('http') ? input : `https://${input}`);
+      // Check if it's a valid domain (has a TLD)
+      if (url.hostname.includes('.')) {
+        return {
+          isUrl: true,
+          url: url.href
+        };
+      }
+    } catch (e) {
+      // Not a valid URL, continue with normal parsing
+    }
+  }
+  
   return {
     engine: selectedEngine,
     query: input.trim(),
@@ -100,7 +117,15 @@ searchForm.addEventListener('submit', e => {
   e.preventDefault();
   const input = searchInput.value.trim();
   if (!input) return;
-  const { engine, query, newTab, directAccess } = parseInput(input);
+  const result = parseInput(input);
+  
+  if (result.isUrl) {
+    // Handle direct URL
+    window.location.href = result.url;
+    return;
+  }
+  
+  const { engine, query, newTab, directAccess } = result;
   
   if (directAccess) {
     // Direct access to search engine
