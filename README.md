@@ -4,7 +4,7 @@ A modern, customizable search page with a matrix-inspired theme and powerful wid
 
 ## Quick Install
 
-### From Chrome Web Store
+### From Chrome Web Store (Currently Not available there)
 1. Visit [Hacker Search](https://chrome.google.com/webstore/detail/your-extension-id) in Chrome Web Store
 2. Click "Add to Chrome"
 3. Confirm the installation
