@@ -2,6 +2,20 @@
 
 A modern, customizable search page with a matrix-inspired theme and powerful widgets. Built as a Chrome extension for a personalized new tab experience.
 
+## Quick Install
+
+### From Chrome Web Store
+1. Visit [Hacker Search](https://chrome.google.com/webstore/detail/your-extension-id) in Chrome Web Store
+2. Click "Add to Chrome"
+3. Confirm the installation
+
+### Manual Installation
+1. Download or clone this repository
+2. Open Chrome and go to `chrome://extensions/`
+3. Enable "Developer mode" in the top right
+4. Click "Load unpacked"
+5. Select the downloaded folder
+
 ## Screenshots
 
 <div align="center">
