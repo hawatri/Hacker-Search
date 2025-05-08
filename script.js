@@ -2,6 +2,9 @@
 const searchForm = document.getElementById('searchForm');
 const searchInput = document.getElementById('searchInput');
 const tags = document.querySelectorAll('.tag');
+const searchSuggestions = document.createElement('div');
+searchSuggestions.className = 'search-suggestions';
+searchForm.appendChild(searchSuggestions);
 
 const searchEngines = {
   google: query => `https://www.google.com/search?q=${encodeURIComponent(query)}`,
@@ -1838,4 +1841,62 @@ async function initializeClipboardWidget() {
 document.addEventListener('DOMContentLoaded', async () => {
   await initializeWidgets();
   await initializeClipboardWidget();
+});
+
+// Function to get history suggestions
+async function getHistorySuggestions(query) {
+  return new Promise((resolve) => {
+    chrome.history.search({
+      text: query,
+      maxResults: 5,
+      startTime: 0
+    }, (results) => {
+      resolve(results.map(item => ({
+        title: item.title,
+        url: item.url
+      })));
+    });
+  });
+}
+
+// Function to show suggestions
+async function showSuggestions(query) {
+  if (!query) {
+    searchSuggestions.style.display = 'none';
+    return;
+  }
+
+  const suggestions = await getHistorySuggestions(query);
+  searchSuggestions.innerHTML = '';
+  
+  if (suggestions.length > 0) {
+    suggestions.forEach(suggestion => {
+      const div = document.createElement('div');
+      div.className = 'suggestion-item';
+      div.innerHTML = `
+        <div class="suggestion-title">${suggestion.title}</div>
+        <div class="suggestion-url">${suggestion.url}</div>
+      `;
+      div.addEventListener('click', () => {
+        window.location.href = suggestion.url;
+      });
+      searchSuggestions.appendChild(div);
+    });
+    searchSuggestions.style.display = 'block';
+  } else {
+    searchSuggestions.style.display = 'none';
+  }
+}
+
+// Add input event listener for suggestions
+searchInput.addEventListener('input', (e) => {
+  const query = e.target.value.trim();
+  showSuggestions(query);
+});
+
+// Hide suggestions when clicking outside
+document.addEventListener('click', (e) => {
+  if (!searchForm.contains(e.target)) {
+    searchSuggestions.style.display = 'none';
+  }
 }); 
