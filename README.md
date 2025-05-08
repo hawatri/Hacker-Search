@@ -119,8 +119,10 @@ hacker-search/
 
 ## Author
 
-Hawatri - Full Stack Developer
+Hawatri:- https://github.com/hawatri
 
 ## License
 
-MIT License - See LICENSE file for details 
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+The MIT License is a permissive license that is short and to the point. It lets people do anything they want with your code as long as they provide attribution back to you and don't hold you liable. 
