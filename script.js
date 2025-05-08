@@ -328,8 +328,40 @@ async function initializeWidgets() {
           widget.style.top = positions[id].top;
         }
         
-        // Restore size
-        if (sizes[id]) {
+        // Set default size if no size is saved
+        if (!sizes[id]) {
+          const sizePresets = {
+            mediaPlayer: [
+              { w: 320, h: 400 },   // Small
+              { w: 400, h: 500 },   // Normal
+              { w: 480, h: 600 },   // Medium
+              { w: 560, h: 700 },   // Large
+              { w: 640, h: 800 }    // Huge
+            ],
+            default: [
+              { w: 240, h: 180 },   // Small
+              { w: 320, h: 240 },   // Normal
+              { w: 400, h: 320 },   // Medium
+              { w: 480, h: 400 },   // Large
+              { w: 560, h: 480 }    // Huge
+            ]
+          };
+          
+          const presetSizes = sizePresets[id] || sizePresets.default;
+          const defaultSize = presetSizes[1]; // Normal size is at index 1
+          
+          widget.style.width = `${defaultSize.w}px`;
+          widget.style.height = `${defaultSize.h}px`;
+          
+          // Update resize button to show Normal size
+          const resizeBtn = widget.querySelector('.resize-btn');
+          resizeBtn.textContent = 'N';
+          resizeBtn.setAttribute('title', 'Size: Normal');
+          
+          // Save the default size
+          saveWidgetSize(id, defaultSize);
+        } else {
+          // Restore saved size
           widget.style.width = `${sizes[id].w}px`;
           widget.style.height = `${sizes[id].h}px`;
         }
@@ -1136,36 +1168,42 @@ function resizeWidget(widget) {
   const currentWidth = widget.offsetWidth;
   const currentHeight = widget.offsetHeight;
   
-  // Define size presets for different widgets
   const sizePresets = {
     mediaPlayer: [
-      { w: 320, h: 400 },  // Small
-      { w: 400, h: 500 },  // Medium
-      { w: 480, h: 600 }   // Large
+      { w: 320, h: 400 },   // Small
+      { w: 400, h: 500 },   // Normal
+      { w: 480, h: 600 },   // Medium
+      { w: 560, h: 700 },   // Large
+      { w: 640, h: 800 }    // Huge
     ],
     default: [
-      { w: 240, h: 180 },  // Small
-      { w: 320, h: 240 },  // Medium
-      { w: 400, h: 320 }   // Large
+      { w: 240, h: 180 },   // Small
+      { w: 320, h: 240 },   // Normal
+      { w: 400, h: 320 },   // Medium
+      { w: 480, h: 400 },   // Large
+      { w: 560, h: 480 }    // Huge
     ]
   };
 
-  // Get the appropriate size preset for this widget
   const sizes = sizePresets[widget.id] || sizePresets.default;
   
-  // Find the next size
-  let nextSizeIndex = 0;
-  for (let i = 0; i < sizes.length; i++) {
-    if (Math.abs(currentWidth - sizes[i].w) < 10 && Math.abs(currentHeight - sizes[i].h) < 10) {
-      nextSizeIndex = (i + 1) % sizes.length;
-      break;
-    }
-  }
-
-  // Apply the new size
+  // Get current size index from the resize button text
+  const resizeBtn = widget.querySelector('.resize-btn');
+  const sizeLabels = ['S', 'N', 'M', 'L', 'H'];
+  const currentLabel = resizeBtn.textContent;
+  const currentIndex = sizeLabels.indexOf(currentLabel);
+  
+  // Calculate next size index
+  const nextSizeIndex = (currentIndex + 1) % sizes.length;
   const newSize = sizes[nextSizeIndex];
+  
+  // Apply the new size
   widget.style.width = `${newSize.w}px`;
   widget.style.height = `${newSize.h}px`;
+
+  // Update resize button text
+  resizeBtn.textContent = sizeLabels[nextSizeIndex];
+  resizeBtn.setAttribute('title', `Size: ${['Small', 'Normal', 'Medium', 'Large', 'Huge'][nextSizeIndex]}`);
 
   // Save the new size
   saveWidgetSize(widget.id, newSize);
@@ -1189,6 +1227,44 @@ function restoreWidgetSizes() {
       if (sizes[id]) {
         widget.style.width = `${sizes[id].w}px`;
         widget.style.height = `${sizes[id].h}px`;
+        
+        // Update resize button text
+        const resizeBtn = widget.querySelector('.resize-btn');
+        const sizePresets = {
+          mediaPlayer: [
+            { w: 320, h: 400 },
+            { w: 400, h: 500 },
+            { w: 480, h: 600 },
+            { w: 560, h: 700 },
+            { w: 640, h: 800 }
+          ],
+          default: [
+            { w: 240, h: 180 },
+            { w: 320, h: 240 },
+            { w: 400, h: 320 },
+            { w: 480, h: 400 },
+            { w: 560, h: 480 }
+          ]
+        };
+        
+        const presetSizes = sizePresets[id] || sizePresets.default;
+        const currentSize = sizes[id];
+        
+        // Find the closest size using the same logic as resizeWidget
+        let closestIndex = 0;
+        let minDiff = Infinity;
+        
+        for (let i = 0; i < presetSizes.length; i++) {
+          const diff = Math.abs(currentSize.w - presetSizes[i].w) + Math.abs(currentSize.h - presetSizes[i].h);
+          if (diff < minDiff) {
+            minDiff = diff;
+            closestIndex = i;
+          }
+        }
+        
+        const sizeLabels = ['S', 'N', 'M', 'L', 'H'];
+        resizeBtn.textContent = sizeLabels[closestIndex];
+        resizeBtn.setAttribute('title', `Size: ${['Small', 'Normal', 'Medium', 'Large', 'Huge'][closestIndex]}`);
       }
     });
   });
@@ -1412,8 +1488,40 @@ async function initializeWidgets() {
           widget.style.top = positions[id].top;
         }
         
-        // Restore size
-        if (sizes[id]) {
+        // Set default size if no size is saved
+        if (!sizes[id]) {
+          const sizePresets = {
+            mediaPlayer: [
+              { w: 320, h: 400 },   // Small
+              { w: 400, h: 500 },   // Normal
+              { w: 480, h: 600 },   // Medium
+              { w: 560, h: 700 },   // Large
+              { w: 640, h: 800 }    // Huge
+            ],
+            default: [
+              { w: 240, h: 180 },   // Small
+              { w: 320, h: 240 },   // Normal
+              { w: 400, h: 320 },   // Medium
+              { w: 480, h: 400 },   // Large
+              { w: 560, h: 480 }    // Huge
+            ]
+          };
+          
+          const presetSizes = sizePresets[id] || sizePresets.default;
+          const defaultSize = presetSizes[1]; // Normal size is at index 1
+          
+          widget.style.width = `${defaultSize.w}px`;
+          widget.style.height = `${defaultSize.h}px`;
+          
+          // Update resize button to show Normal size
+          const resizeBtn = widget.querySelector('.resize-btn');
+          resizeBtn.textContent = 'N';
+          resizeBtn.setAttribute('title', 'Size: Normal');
+          
+          // Save the default size
+          saveWidgetSize(id, defaultSize);
+        } else {
+          // Restore saved size
           widget.style.width = `${sizes[id].w}px`;
           widget.style.height = `${sizes[id].h}px`;
         }
