@@ -1585,6 +1585,86 @@ button[type="submit"]:hover {
   scrollbar-color: var(--primary-color) var(--background-color);
 }
 
+/* Widget size classes */
+.draggable.size-small {
+  min-width: 150px;
+  min-height: 80px;
+  max-width: 250px;
+  max-height: 200px;
+}
+
+.draggable.size-normal {
+  min-width: 200px;
+  min-height: 100px;
+  max-width: 400px;
+  max-height: 500px;
+}
+
+.draggable.size-large {
+  min-width: 300px;
+  min-height: 200px;
+  max-width: 600px;
+  max-height: 700px;
+}
+
+.draggable.size-huge {
+  min-width: 400px;
+  min-height: 300px;
+  max-width: 800px;
+  max-height: 900px;
+}
+
+/* Empty state styles */
+.todo-empty,
+.notes-empty,
+.clipboard-empty {
+  text-align: center;
+  color: var(--primary-light);
+  font-style: italic;
+  padding: 2rem;
+  opacity: 0.7;
+}
+
+/* Weather widget styles */
+.weather-location {
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+.weather-main {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+
+.weather-icon {
+  font-size: 2rem;
+}
+
+.weather-temp {
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+.weather-details {
+  text-align: center;
+  margin-bottom: 0.5rem;
+}
+
+.weather-details div {
+  margin: 0.25rem 0;
+}
+
+.weather-updated {
+  font-size: 0.8rem;
+  color: var(--primary-light);
+  text-align: center;
+  opacity: 0.8;
+}
+
 .lock-btn {
   background: transparent;
   border: 1px solid var(--border-color);
